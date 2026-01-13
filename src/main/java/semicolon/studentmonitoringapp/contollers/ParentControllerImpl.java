@@ -1,0 +1,27 @@
+package semicolon.studentmonitoringapp.contollers;
+
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
+import semicolon.studentmonitoringapp.dtos.response.ResultResponseDto;
+import semicolon.studentmonitoringapp.dtos.response.StudentResponseDto;
+
+import java.util.List;
+import java.util.UUID;
+
+@RestController
+@RequestMapping("api/v1/parents")
+public class ParentControllerImpl implements ParentController {
+    @Override
+    @GetMapping("{parentId}")
+    public List<StudentResponseDto> getLinkedStudents(@PathVariable UUID parentId) {
+        return List.of();
+    }
+
+    @Override
+    @GetMapping("{studentId}")
+    public List<ResultResponseDto> viewResults(@PathVariable UUID studentId) {
+        return List.of();
+    }
+}
