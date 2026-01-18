@@ -4,7 +4,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
-import semicolon.studentmonitoringapp.dtos.response.ResultResponseDto;
+import semicolon.studentmonitoringapp.dtos.response.ScoreResponseDto;
 import semicolon.studentmonitoringapp.dtos.response.StudentResponseDto;
 
 import java.util.List;
@@ -21,7 +21,7 @@ public class ParentControllerImpl implements ParentController {
 
     @Override
     @GetMapping("{studentId}")
-    public List<ResultResponseDto> viewResults(@PathVariable UUID studentId) {
+    public List<ScoreResponseDto> viewResults(@PathVariable UUID studentId) {
         return List.of();
     }
 }

@@ -2,7 +2,7 @@ package semicolon.studentmonitoringapp.contollers;
 
 import com.github.fge.jsonpatch.JsonPatch;
 import org.springframework.web.bind.annotation.*;
-import semicolon.studentmonitoringapp.dtos.request.SubjectRequestDto;
+import semicolon.studentmonitoringapp.dtos.request.CreateSubjectRequestDto;
 import semicolon.studentmonitoringapp.dtos.response.SubjectResponseDto;
 
 import java.util.List;
@@ -13,7 +13,7 @@ import java.util.UUID;
 public class SubjectControllerImpl implements SubjectController {
     @Override
     @PostMapping
-    public void createSubject(SubjectRequestDto subjectRequestDto) {
+    public void createSubject(CreateSubjectRequestDto subjectRequestDto) {
 
     }
 

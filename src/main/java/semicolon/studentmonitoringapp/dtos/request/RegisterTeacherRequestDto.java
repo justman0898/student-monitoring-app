@@ -1,7 +1,6 @@
 package semicolon.studentmonitoringapp.dtos.request;
 
 import jakarta.validation.constraints.NotNull;
-import jakarta.validation.constraints.PositiveOrZero;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -9,23 +8,25 @@ import java.util.UUID;
 
 @Getter
 @Setter
-public class SubmitScoreRequestDto {
+public class RegisterTeacherRequestDto {
 
     @NotNull
-    private UUID studentId;
+    private String firstName;
 
     @NotNull
-    private UUID teacherId;
+    private String lastName;
 
     @NotNull
-    private UUID assessmentConfigId;
+    private String email;
 
-    @PositiveOrZero
     @NotNull
-    private Integer score;
+    private String phone;
 
+    @NotNull
+    private String address;
 
-
+    @NotNull
+    private UUID classId;
 
 
 }

@@ -2,7 +2,8 @@ package semicolon.studentmonitoringapp.contollers;
 
 import com.github.fge.jsonpatch.JsonPatch;
 import org.springframework.web.bind.annotation.*;
-import semicolon.studentmonitoringapp.dtos.request.ClassRequestDto;
+import semicolon.studentmonitoringapp.dtos.request.CreateClassRequestDto;
+import semicolon.studentmonitoringapp.dtos.request.CreateAssessmentTypeRequestDto;
 import semicolon.studentmonitoringapp.dtos.request.CreateParentRequestDto;
 import semicolon.studentmonitoringapp.dtos.response.ClassResponseDto;
 import semicolon.studentmonitoringapp.dtos.response.CreateParentResponseDto;
@@ -15,7 +16,7 @@ public class AdminClassControllerImpl implements AdminClassController {
 
     @Override
     @PostMapping()
-    public void createClass(ClassRequestDto classRequestDto) {
+    public void createClass(CreateClassRequestDto classRequestDto) {
 
     }
 
@@ -53,5 +54,11 @@ public class AdminClassControllerImpl implements AdminClassController {
     @PostMapping("/add-parent")
     public CreateParentResponseDto addParent(CreateParentRequestDto createParentRequestDto) {
         return null;
+    }
+
+    @Override
+    @PostMapping("assessment-types")
+    public void createAssessmentType(List<CreateAssessmentTypeRequestDto> createAssessmentTypeRequestDto) {
+
     }
 }

@@ -5,11 +5,9 @@ import lombok.Setter;
 
 import java.util.UUID;
 
-
 @Getter
 @Setter
-public class SubjectResponseDto {
+public class AssessmentTypeResponseDto {
     private UUID id;
-    private String name;
     private String code;
 }

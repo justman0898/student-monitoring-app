@@ -1,7 +1,7 @@
 package semicolon.studentmonitoringapp.contollers;
 
 import org.springframework.web.bind.annotation.*;
-import semicolon.studentmonitoringapp.dtos.request.RegisterRequestDto;
+import semicolon.studentmonitoringapp.dtos.request.RegisterTeacherRequestDto;
 import semicolon.studentmonitoringapp.dtos.response.TeacherRegistrationDetailsDto;
 import semicolon.studentmonitoringapp.dtos.response.TeacherResponseDto;
 
@@ -14,7 +14,7 @@ public class AdminTeacherControllerImpl implements AdminTeacherController {
 
     @Override
     @PostMapping
-    public TeacherRegistrationDetailsDto registerTeacher(RegisterRequestDto registerRequestDto) {
+    public TeacherRegistrationDetailsDto registerTeacher(RegisterTeacherRequestDto registerRequestDto) {
         return null;
     }
 
