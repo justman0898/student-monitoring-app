@@ -15,18 +15,12 @@ public class CreateClassRequestDto {
     private String className;
 
     @NotNull
-    private String section;
-
-    @NotNull
     private String academicYear;
 
-    @NotNull
-    private List<UUID> teacherId;
 
-    @NotEmpty
-    private List<UUID> subjectIds;
+    private List<UUID> teacherIds;
 
-    @NotEmpty
+
     private List<UUID> studentIds;
 
 

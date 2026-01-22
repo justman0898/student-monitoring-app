@@ -5,16 +5,16 @@ import jakarta.validation.constraints.NotNull;
 import lombok.Getter;
 import lombok.Setter;
 
-import java.time.Instant;
-import java.util.HashSet;
-import java.util.List;
 import java.util.Set;
 import java.util.UUID;
 
-@Entity
 @Getter
 @Setter
-public class Student {
+@Entity
+@Table(
+        name = "users"
+)
+public class User {
     @Id
     @GeneratedValue
     @Column(unique = true, nullable = false, columnDefinition = "uuid", updatable = false)
@@ -22,25 +22,17 @@ public class Student {
 
     @Column(nullable = false)
     @NotNull
-    private String firstName;
+    private String email;
 
     @Column(nullable = false)
     @NotNull
-    private String lastName;
+    private String password;
 
-    @ManyToMany(mappedBy = "students")
-    private Set<SchoolClass> schoolClass;
-
-    private String email;
-
-    @ManyToMany(mappedBy = "students",  fetch = FetchType.LAZY)
-    private Set<Parent> parents = new HashSet<>();
-
-    private Instant createdAt = Instant.now();
-
+    @ElementCollection(fetch = FetchType.EAGER)
+    @CollectionTable(
+            name = "user_roles",
+            joinColumns = @JoinColumn(name = "user_id")
+    )
     @Enumerated(EnumType.STRING)
-    @NotNull
-    private Gender gender;
-
-
+    private Set<Role> roles;
 }

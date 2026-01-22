@@ -4,6 +4,8 @@ import lombok.Getter;
 import lombok.Setter;
 import semicolon.studentmonitoringapp.data.models.Gender;
 
+import java.time.Instant;
+import java.util.List;
 import java.util.Set;
 import java.util.UUID;
 
@@ -17,5 +19,10 @@ public class StudentResponseDto {
     private String email;
     private Gender gender;
 
-    private Set<CreateParentResponseDto>  parents;
+    private Instant createdAt;
+
+
+
+
+    private List<CreateParentResponseDto> parents;
 }

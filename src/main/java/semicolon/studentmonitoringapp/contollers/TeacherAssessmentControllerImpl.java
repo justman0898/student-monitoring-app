@@ -11,7 +11,7 @@ import java.util.UUID;
 public class TeacherAssessmentControllerImpl implements TeacherAssessmentController {
 
     @Override
-    @PostMapping
+    @PostMapping("/submit")
     public void submitScore(SubmitScoreRequestDto submitScoreRequestDto) {
 
     }

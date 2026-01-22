@@ -1,22 +1,30 @@
 package semicolon.studentmonitoringapp.contollers;
 
-import com.github.fge.jsonpatch.JsonPatch;
+import jakarta.validation.Valid;
+import lombok.AllArgsConstructor;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import semicolon.studentmonitoringapp.dtos.request.CreateClassRequestDto;
 import semicolon.studentmonitoringapp.dtos.request.CreateAssessmentTypeRequestDto;
 import semicolon.studentmonitoringapp.dtos.request.CreateParentRequestDto;
+import semicolon.studentmonitoringapp.dtos.request.SchoolClassPatchRequestDto;
 import semicolon.studentmonitoringapp.dtos.response.ClassResponseDto;
 import semicolon.studentmonitoringapp.dtos.response.CreateParentResponseDto;
+import semicolon.studentmonitoringapp.services.AdminClassService;
 
 import java.util.List;
 import java.util.UUID;
 @RestController
 @RequestMapping("/api/v1/admin/classes")
+@AllArgsConstructor
 public class AdminClassControllerImpl implements AdminClassController {
+    private final AdminClassService classService;
 
     @Override
-    @PostMapping()
-    public void createClass(CreateClassRequestDto classRequestDto) {
+    @PostMapping("/create")
+    public ResponseEntity<?> createClass(@Valid @RequestBody CreateClassRequestDto classRequestDto) {
+        classService.createClass(classRequestDto);
+        return ResponseEntity.accepted().build();
 
     }
 
@@ -27,9 +35,10 @@ public class AdminClassControllerImpl implements AdminClassController {
     }
 
     @Override
-    @PutMapping("/{classId}")
-    public void updateClass(@PathVariable UUID classId, JsonPatch patch) {
-
+    @PatchMapping("/{classId}")
+    public ResponseEntity<?> updateClass(@PathVariable UUID classId, @RequestBody SchoolClassPatchRequestDto classPatchDto) {
+        classService.updateClass(classId, classPatchDto);
+        return ResponseEntity.noContent().build();
     }
 
     @Override
@@ -38,11 +47,6 @@ public class AdminClassControllerImpl implements AdminClassController {
 
     }
 
-    @Override()
-    @PostMapping("/{classId}/assign-teacher/{teacherId}")
-    public void assignTeacher(@PathVariable UUID classId, @PathVariable UUID teacherId) {
-
-    }
 
     @Override
     @PostMapping("/{teacherId}")
@@ -59,6 +63,11 @@ public class AdminClassControllerImpl implements AdminClassController {
     @Override
     @PostMapping("assessment-types")
     public void createAssessmentType(List<CreateAssessmentTypeRequestDto> createAssessmentTypeRequestDto) {
+
+    }
+
+    @Override
+    public void createAssessmentConfig() {
 
     }
 }

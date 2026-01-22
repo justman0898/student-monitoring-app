@@ -1,9 +1,10 @@
 package semicolon.studentmonitoringapp.contollers;
 
-import com.github.fge.jsonpatch.JsonPatch;
+import org.springframework.http.ResponseEntity;
 import semicolon.studentmonitoringapp.dtos.request.CreateClassRequestDto;
 import semicolon.studentmonitoringapp.dtos.request.CreateAssessmentTypeRequestDto;
 import semicolon.studentmonitoringapp.dtos.request.CreateParentRequestDto;
+import semicolon.studentmonitoringapp.dtos.request.SchoolClassPatchRequestDto;
 import semicolon.studentmonitoringapp.dtos.response.ClassResponseDto;
 import semicolon.studentmonitoringapp.dtos.response.CreateParentResponseDto;
 
@@ -12,11 +13,10 @@ import java.util.UUID;
 
 public interface AdminClassController {
 
-    void createClass(CreateClassRequestDto classRequestDto);
+    ResponseEntity<?> createClass(CreateClassRequestDto classRequestDto);
     List<ClassResponseDto> getAllClasses();
-    void updateClass(UUID classId, JsonPatch patch);
+    ResponseEntity<?> updateClass(UUID classId, SchoolClassPatchRequestDto classPatchDto);
     void deleteClass(UUID classId);
-    void assignTeacher(UUID classId, UUID teacherId);
     void unassignTeacher(UUID teacherId);
     CreateParentResponseDto addParent(CreateParentRequestDto createParentRequestDto);
     void createAssessmentType(List<CreateAssessmentTypeRequestDto> createAssessmentTypeRequestDto);
