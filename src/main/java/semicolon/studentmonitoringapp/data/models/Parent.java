@@ -17,7 +17,7 @@ import java.util.UUID;
 @Setter
 public class Parent {
 
-    @Id @GeneratedValue @Column(columnDefinition = "uuid")
+    @Id @GeneratedValue @Column(columnDefinition = "uuid", updatable = false, nullable = false)
     private UUID id;
 
     @Column(nullable = false)
@@ -62,12 +62,12 @@ public class Parent {
     private Instant createdAt = Instant.now();
 
 
-    public void add(Student student) {
+    public void addStudent(Student student) {
         students.add(student);
         student.getParents().add(this);
     }
 
-    public void remove(Student student) {
+    public void removeStudent(Student student) {
         students.remove(student);
         student.getParents().remove(this);
     }

@@ -2,11 +2,13 @@ package semicolon.studentmonitoringapp.utils.mappers;
 
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
-import semicolon.studentmonitoringapp.data.models.SchoolClass;
-import semicolon.studentmonitoringapp.data.models.Student;
-import semicolon.studentmonitoringapp.data.models.Teacher;
+import semicolon.studentmonitoringapp.data.models.*;
+import semicolon.studentmonitoringapp.dtos.request.CreateAssessmentConfigRequestDto;
+import semicolon.studentmonitoringapp.dtos.request.CreateAssessmentTypeRequestDto;
 import semicolon.studentmonitoringapp.dtos.request.CreateClassRequestDto;
+import semicolon.studentmonitoringapp.dtos.request.CreateParentRequestDto;
 import semicolon.studentmonitoringapp.dtos.response.ClassResponseDto;
+import semicolon.studentmonitoringapp.dtos.response.CreateAssessmentTypeResponseDto;
 import semicolon.studentmonitoringapp.dtos.response.StudentResponseDto;
 import semicolon.studentmonitoringapp.dtos.response.TeacherResponseDto;
 
@@ -30,4 +32,15 @@ public interface SchoolClassMapper {
 
     @Mapping(target = "parents", ignore = true)
     StudentResponseDto toDto(Student student);
+
+    @Mapping(target = "students", ignore = true)
+    @Mapping(target = "createdAt", ignore = true)
+    Parent toEntity(CreateParentRequestDto createParentRequestDto);
+
+    @Mapping(target = "code", ignore = true)
+    AssessmentType toEntity(CreateAssessmentTypeRequestDto createAssessmentTypeRequestDto);
+    CreateAssessmentTypeResponseDto toDto(AssessmentType assessmentType);
+
+    @Mapping(target = "createdAt", ignore = true)
+    AssessmentConfig toEntity(CreateAssessmentConfigRequestDto createAssessmentConfigRequestDto);
 }

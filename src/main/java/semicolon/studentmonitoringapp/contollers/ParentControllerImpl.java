@@ -11,10 +11,10 @@ import java.util.List;
 import java.util.UUID;
 
 @RestController
-@RequestMapping("api/v1/parents")
+@RequestMapping("api/v1/parent")
 public class ParentControllerImpl implements ParentController {
     @Override
-    @GetMapping("{parentId}")
+    @GetMapping("/students/{parentId}")
     public List<StudentResponseDto> getLinkedStudents(@PathVariable UUID parentId) {
         return List.of();
     }

@@ -2,16 +2,15 @@ package semicolon.studentmonitoringapp.contollers;
 
 import jakarta.validation.Valid;
 import lombok.AllArgsConstructor;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import semicolon.studentmonitoringapp.dtos.request.CreateClassRequestDto;
-import semicolon.studentmonitoringapp.dtos.request.CreateAssessmentTypeRequestDto;
-import semicolon.studentmonitoringapp.dtos.request.CreateParentRequestDto;
-import semicolon.studentmonitoringapp.dtos.request.SchoolClassPatchRequestDto;
+import semicolon.studentmonitoringapp.dtos.request.*;
 import semicolon.studentmonitoringapp.dtos.response.ClassResponseDto;
 import semicolon.studentmonitoringapp.dtos.response.CreateParentResponseDto;
 import semicolon.studentmonitoringapp.services.AdminClassService;
 
+import java.net.URI;
 import java.util.List;
 import java.util.UUID;
 @RestController
@@ -23,8 +22,8 @@ public class AdminClassControllerImpl implements AdminClassController {
     @Override
     @PostMapping("/create")
     public ResponseEntity<?> createClass(@Valid @RequestBody CreateClassRequestDto classRequestDto) {
-        classService.createClass(classRequestDto);
-        return ResponseEntity.accepted().build();
+        UUID schoolClassId = classService.createClass(classRequestDto);
+        return ResponseEntity.created(URI.create("/api/v1/")).build();
 
     }
 
@@ -42,32 +41,64 @@ public class AdminClassControllerImpl implements AdminClassController {
     }
 
     @Override
-    @DeleteMapping("/students/{classId}")
-    public void deleteClass(@PathVariable UUID classId) {
-
+    @DeleteMapping("de-activate/{classId}")
+    public ResponseEntity<?> deleteClass(@PathVariable UUID classId) {
+        classService.deactivateClass(classId);
+        return ResponseEntity.noContent().build();
     }
 
 
     @Override
-    @PostMapping("/{teacherId}")
-    public void unassignTeacher(@PathVariable UUID teacherId) {
+    @PatchMapping("/{classId}/un-assign/{teacherId}")
+    public ResponseEntity<?> unassignTeacher(@PathVariable UUID classId, @PathVariable UUID teacherId) {
+        classService.removeTeacherFromClass(classId, teacherId);
+        return ResponseEntity.noContent().build();
+    }
+
+    @Override
+    @PostMapping("/create-parent")
+    public ResponseEntity<CreateParentResponseDto> addParent(@Valid @RequestBody CreateParentRequestDto createParentRequestDto) {
+        UUID parentId = classService.createParentProfile(createParentRequestDto);
+        return ResponseEntity
+                .created(URI.create("/api/v1/parent/"+parentId))
+                .build();
+    }
+
+    @Override
+    @PostMapping("assessment-type")
+    public ResponseEntity<?> createAssessmentType(@Valid @RequestBody CreateAssessmentTypeRequestDto createAssessmentTypeRequestDto) {
+        UUID assessmentTypeId = classService.createAssessmentType(createAssessmentTypeRequestDto);
+        return ResponseEntity
+                .created(URI.create("/api/v1/admin/classes/"+assessmentTypeId))
+                .build();
+    }
+
+    @Override
+    @PostMapping("assessment-config")
+    public ResponseEntity<?> createAssessmentConfig(CreateAssessmentConfigRequestDto createAssessmentConfigRequestDto) {
+        UUID assessmentConfigId = classService.createAssessmentConfig(createAssessmentConfigRequestDto);
+        return ResponseEntity
+                .created(URI.create("/api/v1/classes/"+assessmentConfigId))
+                .build();
+    }
+
+    @Override
+    @GetMapping("/{assessmentTypeId}")
+    public ResponseEntity<?> getAssessmentType(@PathVariable UUID assessmentTypeId) {
+        return ResponseEntity
+                .ok()
+                .contentType(MediaType.APPLICATION_JSON)
+                .body(classService.getAssessmentType(assessmentTypeId));
 
     }
 
     @Override
-    @PostMapping("/add-parent")
-    public CreateParentResponseDto addParent(CreateParentRequestDto createParentRequestDto) {
-        return null;
+    @GetMapping("assessment-types")
+    public ResponseEntity<?> getAllAssessmentTypes() {
+        return ResponseEntity.ok()
+                .contentType(MediaType.APPLICATION_JSON)
+                .body(classService.getAllAssessmentTypes());
     }
 
-    @Override
-    @PostMapping("assessment-types")
-    public void createAssessmentType(List<CreateAssessmentTypeRequestDto> createAssessmentTypeRequestDto) {
 
-    }
-
-    @Override
-    public void createAssessmentConfig() {
-
-    }
 }

@@ -44,6 +44,10 @@ public class SchoolClass {
     )
     private Set<Student> students = new HashSet<>();
 
+    @Column(nullable = false)
+    @NotNull
+    private Boolean isActive = true;
+
 
     public void addTeacher(Teacher teacher) {
         this.teachers.add(teacher);

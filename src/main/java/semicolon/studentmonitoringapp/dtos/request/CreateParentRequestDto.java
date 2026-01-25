@@ -1,8 +1,12 @@
 package semicolon.studentmonitoringapp.dtos.request;
 
+import jakarta.validation.constraints.Email;
+import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import lombok.Getter;
 import lombok.Setter;
+import semicolon.studentmonitoringapp.data.models.Parent;
+import semicolon.studentmonitoringapp.utils.annotations.ExistsInDb;
 
 import java.util.List;
 import java.util.UUID;
@@ -10,27 +14,35 @@ import java.util.UUID;
 @Getter
 @Setter
 public class CreateParentRequestDto {
-    @NotNull
+    @NotNull(message = "Cannot be empty")
     private String firstName;
 
-    @NotNull
+    @NotBlank(message = "Cannot be empty")
     private String lastName;
 
-    @NotNull
+    @NotBlank(message = "Cannot be empty")
+    @Email(message = "Invalid email address")
+    @ExistsInDb(entity = Parent.class,
+    field = "email",
+            message = "Email already exists"
+    )
     private String email;
 
-    @NotNull
+    @NotBlank(message = "Cannot be empty")
     private String address;
 
-    @NotNull
+    @NotBlank(message = "Cannot be empty")
+    @ExistsInDb(entity = Parent.class,
+            field = "phone",
+            message = "Phone already exists"
+    )
     private String phone;
 
-    @NotNull
+
     private List<UUID> studentIds;
 
-    @NotNull
     private Boolean notificationEnabled;
 
-    @NotNull
+
     private String preferredLanguage;
 }

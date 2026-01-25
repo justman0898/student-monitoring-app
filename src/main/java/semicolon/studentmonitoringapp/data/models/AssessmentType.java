@@ -25,6 +25,8 @@ public class AssessmentType {
     @NotNull
     private String code;
 
+    private String description;
+
     @Column(nullable = false)
     @NotNull
     private Instant createdAt =  Instant.now();

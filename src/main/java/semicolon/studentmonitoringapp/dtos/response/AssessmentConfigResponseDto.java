@@ -13,7 +13,7 @@ public class AssessmentConfigResponseDto {
     private UUID id;
     private SubjectResponseDto subject;
     private ClassResponseDto schoolClass;
-    private AssessmentTypeResponseDto assessmentType;
+    private CreateAssessmentTypeResponseDto assessmentType;
     private Integer maxScore;
     private Integer weight;
     private String academicYear;
