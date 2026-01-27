@@ -1,5 +1,6 @@
 package semicolon.studentmonitoringapp.contollers;
 
+import org.springframework.http.ResponseEntity;
 import semicolon.studentmonitoringapp.dtos.request.RegisterTeacherRequestDto;
 import semicolon.studentmonitoringapp.dtos.response.TeacherRegistrationDetailsDto;
 import semicolon.studentmonitoringapp.dtos.response.TeacherResponseDto;
@@ -9,9 +10,9 @@ import java.util.UUID;
 
 public interface AdminTeacherController {
 
-   TeacherRegistrationDetailsDto registerTeacher (RegisterTeacherRequestDto registerRequestDto);
-   List<TeacherResponseDto> getTeachers ();
-   TeacherResponseDto getTeacher (UUID teacherId);
-   void removeTeacher (UUID teacherId);
+   ResponseEntity<TeacherRegistrationDetailsDto> registerTeacher (RegisterTeacherRequestDto registerRequestDto);
+   ResponseEntity<List<TeacherResponseDto>> getTeachers ();
+   ResponseEntity<TeacherResponseDto> getTeacher (UUID teacherId);
+   ResponseEntity<UUID> removeTeacher (UUID teacherId);
 
 }

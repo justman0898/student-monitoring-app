@@ -3,10 +3,7 @@ package semicolon.studentmonitoringapp.utils.mappers;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import semicolon.studentmonitoringapp.data.models.*;
-import semicolon.studentmonitoringapp.dtos.request.CreateAssessmentConfigRequestDto;
-import semicolon.studentmonitoringapp.dtos.request.CreateAssessmentTypeRequestDto;
-import semicolon.studentmonitoringapp.dtos.request.CreateClassRequestDto;
-import semicolon.studentmonitoringapp.dtos.request.CreateParentRequestDto;
+import semicolon.studentmonitoringapp.dtos.request.*;
 import semicolon.studentmonitoringapp.dtos.response.ClassResponseDto;
 import semicolon.studentmonitoringapp.dtos.response.CreateAssessmentTypeResponseDto;
 import semicolon.studentmonitoringapp.dtos.response.StudentResponseDto;
@@ -26,7 +23,7 @@ public interface SchoolClassMapper {
     @Mapping(target = "students",  ignore = true)
     ClassResponseDto toDto(SchoolClass schoolClass);
 
-    @Mapping(target = "createdAt", ignore = true)
+
     @Mapping(target = "schoolClasses", ignore = true)
     TeacherResponseDto toDto(Teacher teacher);
 
@@ -43,4 +40,6 @@ public interface SchoolClassMapper {
 
     @Mapping(target = "createdAt", ignore = true)
     AssessmentConfig toEntity(CreateAssessmentConfigRequestDto createAssessmentConfigRequestDto);
+
+    Teacher toEntity(RegisterTeacherRequestDto registerRequestDto);
 }

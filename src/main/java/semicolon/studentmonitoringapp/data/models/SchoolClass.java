@@ -4,6 +4,7 @@ import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
 import lombok.Getter;
 import lombok.Setter;
+import lombok.ToString;
 
 import java.time.Instant;
 import java.time.LocalDateTime;
@@ -13,6 +14,7 @@ import java.util.UUID;
 
 @Getter
 @Setter
+@ToString
 @Entity
 public class SchoolClass {
 
@@ -33,7 +35,12 @@ public class SchoolClass {
     @NotNull
     private Instant createdAt = Instant.now();
 
-    @ManyToMany(mappedBy = "schoolClasses",  fetch = FetchType.LAZY)
+    @ManyToMany(fetch = FetchType.LAZY)
+    @JoinTable(
+            joinColumns = @JoinColumn(name = "class_id"),
+            name = "teacher_class",
+            inverseJoinColumns = @JoinColumn(name = "teacher_id")
+    )
     private Set<Teacher> teachers = new HashSet<>();
 
     @ManyToMany(fetch = FetchType.LAZY)

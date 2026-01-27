@@ -29,11 +29,17 @@ public class Student {
     private String lastName;
 
     @ManyToMany(mappedBy = "students")
+
     private Set<SchoolClass> schoolClass;
 
     private String email;
 
-    @ManyToMany(mappedBy = "students",  fetch = FetchType.LAZY)
+    @ManyToMany(fetch = FetchType.LAZY)
+    @JoinTable(
+            name = "student_parent",
+            joinColumns = @JoinColumn(name = "student_id"),
+            inverseJoinColumns = @JoinColumn(name = "parent_id")
+    )
     private Set<Parent> parents = new HashSet<>();
 
     private Instant createdAt = Instant.now();

@@ -45,12 +45,7 @@ public class Parent {
     @NotNull
     private Gender gender;
 
-    @ManyToMany
-    @JoinTable(
-            name = "parent_student",
-            joinColumns = @JoinColumn(name = "parent_id"),
-            inverseJoinColumns = @JoinColumn(name = "student_id")
-    )
+    @ManyToMany(mappedBy = "students",  fetch = FetchType.LAZY)
     private Set<Student> students = new HashSet<>();
 
     @Column(nullable = false)
