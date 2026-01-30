@@ -1,20 +1,29 @@
 import { useState } from 'react'
-import { Link, useLocation } from 'react-router-dom'
-import { Menu, X, Home, Users, BookOpen, GraduationCap, UserPlus, ClipboardList, BarChart3 } from 'lucide-react'
+import { Link, useLocation, useNavigate } from 'react-router-dom'
+import { Menu, X, Home, Users, BookOpen, GraduationCap, UserPlus, ClipboardList, BarChart3, Settings, LogOut } from 'lucide-react'
+import { useAuth } from '../contexts/AuthContext'
 
 const Layout = ({ children }) => {
   const [sidebarOpen, setSidebarOpen] = useState(false)
   const location = useLocation()
+  const navigate = useNavigate()
+  const { logout } = useAuth()
 
   const navigation = [
-    { name: 'Dashboard', href: '/', icon: Home },
-    { name: 'Teachers', href: '/teachers', icon: Users },
-    { name: 'Classes', href: '/classes', icon: GraduationCap },
-    { name: 'Subjects', href: '/subjects', icon: BookOpen },
-    { name: 'Parents', href: '/parents', icon: UserPlus },
-    { name: 'Assessments', href: '/assessments', icon: ClipboardList },
-    { name: 'Analytics', href: '/analytics', icon: BarChart3 }
+    { name: 'Dashboard', href: '/admin/dashboard', icon: Home },
+    { name: 'Teachers', href: '/admin/teachers', icon: Users },
+    { name: 'Classes', href: '/admin/classes', icon: GraduationCap },
+    { name: 'Subjects', href: '/admin/subjects', icon: BookOpen },
+    { name: 'Parents', href: '/admin/parents', icon: UserPlus },
+    { name: 'Assessments', href: '/admin/assessments', icon: ClipboardList },
+    { name: 'Assessment Types', href: '/admin/assessment-types', icon: Settings },
+    { name: 'Analytics', href: '/admin/analytics', icon: BarChart3 }
   ]
+
+  const handleLogout = () => {
+    logout()
+    navigate('/login')
+  }
 
   return (
     <div className="min-h-screen bg-gray-50">
@@ -38,7 +47,7 @@ const Layout = ({ children }) => {
             <X className="w-6 h-6" />
           </button>
         </div>
-        <nav className="p-4 space-y-2">
+        <nav className="p-4 space-y-2 flex-1">
           {navigation.map((item) => {
             const Icon = item.icon
             const isActive = location.pathname === item.href
@@ -61,6 +70,17 @@ const Layout = ({ children }) => {
             )
           })}
         </nav>
+        
+        {/* Logout button at bottom of sidebar */}
+        <div className="p-4 border-t">
+          <button
+            onClick={handleLogout}
+            className="flex items-center gap-3 px-4 py-3 w-full text-gray-700 hover:bg-gray-100 rounded-lg transition-colors"
+          >
+            <LogOut className="w-5 h-5" />
+            <span className="font-medium">Logout</span>
+          </button>
+        </div>
       </aside>
 
       {/* Main content */}

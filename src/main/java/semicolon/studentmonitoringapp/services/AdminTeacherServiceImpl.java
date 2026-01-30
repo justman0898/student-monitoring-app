@@ -102,13 +102,21 @@ public class AdminTeacherServiceImpl implements AdminTeacherService {
         Teacher teacher = mapper.toEntity(registerRequestDto);
         String hashedPassword = passwordEncoder.encode(Utility.generateTeacherPassword());
         teacher.setGeneratedPassword(hashedPassword);
-        List<SchoolClass> schoolClasses = schoolClassRepository.findAllById(registerRequestDto.getClassIds());
-        teacher.setSchoolClasses(new HashSet<>(schoolClasses));
+        
+        // Handle class assignment - only if classIds are provided
+        if (registerRequestDto.getClassIds() != null && !registerRequestDto.getClassIds().isEmpty()) {
+            List<SchoolClass> schoolClasses = schoolClassRepository.findAllById(registerRequestDto.getClassIds());
+            teacher.setSchoolClasses(new HashSet<>(schoolClasses));
+        } else {
+            teacher.setSchoolClasses(new HashSet<>());
+        }
+        
         Teacher saved = teacherRepository.save(teacher);
         log.info("Saved teacher : {}", saved);
         TeacherRegistrationDetailsDto registrationDetailsDto = new TeacherRegistrationDetailsDto();
         registrationDetailsDto.setGeneratedPassword(teacher.getGeneratedPassword());
         registrationDetailsDto.setEmail(teacher.getEmail());
+        registrationDetailsDto.setTeacherId(saved.getId());
         return registrationDetailsDto;
     }
 

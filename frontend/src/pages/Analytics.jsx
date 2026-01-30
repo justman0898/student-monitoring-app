@@ -49,6 +49,12 @@ const Analytics = () => {
             {loading ? 'Loading...' : 'Analyze'}
           </button>
         </div>
+        <div className="mt-4 p-4 bg-yellow-50 border border-yellow-200 rounded-lg">
+          <p className="text-sm text-yellow-800">
+            <strong>Note:</strong> Analytics endpoints are currently being implemented. 
+            Some features may not return data until the backend analysis service is fully configured.
+          </p>
+        </div>
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">

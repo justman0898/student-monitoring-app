@@ -73,8 +73,15 @@ public class AdminClassServiceImpl implements AdminClassService {
     @Transactional
     public UUID createParentProfile(CreateParentRequestDto createParentRequestDto) {
         Parent parent = schoolClassMapper.toEntity(createParentRequestDto);
-        List<Student> students = studentRepository.findAllById(createParentRequestDto.getStudentIds());
-        parent.setStudents(new HashSet<>(students));
+        
+        // Handle student assignment - only if studentIds are provided
+        if (createParentRequestDto.getStudentIds() != null && !createParentRequestDto.getStudentIds().isEmpty()) {
+            List<Student> students = studentRepository.findAllById(createParentRequestDto.getStudentIds());
+            parent.setStudents(new HashSet<>(students));
+        } else {
+            parent.setStudents(new HashSet<>());
+        }
+        
         Parent saved = parentRepository.save(parent);
         return saved.getId();
     }

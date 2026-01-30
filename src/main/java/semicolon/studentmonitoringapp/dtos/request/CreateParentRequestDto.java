@@ -6,6 +6,7 @@ import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Pattern;
 import lombok.Getter;
 import lombok.Setter;
+import semicolon.studentmonitoringapp.data.models.Gender;
 import semicolon.studentmonitoringapp.data.models.Parent;
 import semicolon.studentmonitoringapp.utils.annotations.ExistsInDb;
 
@@ -40,11 +41,12 @@ public class CreateParentRequestDto {
     @Pattern(regexp = "^\\d{9,}$", message = "phone number cannot be less than 9")
     private String phone;
 
+    @NotNull
+    private Gender gender;
 
     private List<UUID> studentIds;
 
     private Boolean notificationEnabled;
-
 
     private String preferredLanguage;
 }

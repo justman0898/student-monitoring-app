@@ -41,10 +41,31 @@ public class SecurityConfig {
                 .csrf(AbstractHttpConfigurer::disable)
                 .cors(AbstractHttpConfigurer::disable)
                 .authorizeHttpRequests(auth -> auth
+                        // Login endpoints - public
                         .requestMatchers(HttpMethod.POST,"/api/v1/admin/login").permitAll()
                         .requestMatchers(HttpMethod.POST,"/api/v1/parent/login").permitAll()
                         .requestMatchers(HttpMethod.POST,"/api/v1/teacher/login").permitAll()
+                        
+                        // Registration endpoints - public
+                        .requestMatchers(HttpMethod.POST, "/api/v1/teachers").permitAll()
+                        .requestMatchers(HttpMethod.POST, "/api/v1/admin/classes/create-parent").permitAll()
+                        
+                        // Admin endpoints - require ADMIN role
                         .requestMatchers(HttpMethod.POST, "/api/v1/admin/classes").hasRole("ADMIN")
+                        .requestMatchers("/api/v1/admin/**").hasRole("ADMIN")
+                        
+                        // Teacher endpoints - require TEACHER role
+                        .requestMatchers("/api/v1/teachers/**").hasRole("TEACHER")
+                        
+                        // Parent endpoints - require PARENT role
+                        .requestMatchers("/api/v1/parent/**").hasRole("PARENT")
+                        
+                        // Subject endpoints - accessible by ADMIN and TEACHER
+                        .requestMatchers(HttpMethod.GET, "/api/v1/subjects").hasAnyRole("ADMIN", "TEACHER")
+                        .requestMatchers("/api/v1/subjects/**").hasRole("ADMIN")
+                        
+                        // All other requests require authentication
+                        .anyRequest().authenticated()
                 )
                 .userDetailsService(userDetailsService)
                 .build();
