@@ -4,6 +4,7 @@ import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import lombok.Getter;
 import lombok.Setter;
+import semicolon.studentmonitoringapp.utils.annotations.Trimmed;
 
 import java.util.UUID;
 
@@ -21,5 +22,6 @@ public class CreateAssessmentConfigRequestDto {
 
     private Integer weight;
     @NotBlank(message = "please enter an academic year")
+    @Trimmed
     private String academicYear;
 }

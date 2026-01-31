@@ -5,6 +5,7 @@ import lombok.Getter;
 import lombok.Setter;
 import semicolon.studentmonitoringapp.data.models.Subject;
 import semicolon.studentmonitoringapp.utils.annotations.ExistsInDb;
+import semicolon.studentmonitoringapp.utils.annotations.Trimmed;
 
 @Getter
 @Setter
@@ -15,6 +16,7 @@ public class CreateSubjectRequestDto {
             field = "name",
             message = "Subject name already exists"
     )
+    @Trimmed
     private String name;
 
     @NotNull
@@ -23,5 +25,6 @@ public class CreateSubjectRequestDto {
             field = "code",
             message = "Subject code already exists"
     )
+    @Trimmed
     private String code;
 }

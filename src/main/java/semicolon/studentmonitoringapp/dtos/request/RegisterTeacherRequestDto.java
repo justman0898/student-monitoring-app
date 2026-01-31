@@ -10,6 +10,7 @@ import semicolon.studentmonitoringapp.data.models.Gender;
 import semicolon.studentmonitoringapp.data.models.Subject;
 import semicolon.studentmonitoringapp.data.models.Teacher;
 import semicolon.studentmonitoringapp.utils.annotations.ExistsInDb;
+import semicolon.studentmonitoringapp.utils.annotations.Trimmed;
 
 import java.util.List;
 import java.util.UUID;
@@ -19,9 +20,11 @@ import java.util.UUID;
 public class RegisterTeacherRequestDto {
 
     @NotBlank(message = "Cannot be blank")
+    @Trimmed
     private String firstName;
 
     @NotBlank(message = "Cannot be empty")
+    @Trimmed
     private String lastName;
 
     @NotNull
@@ -31,6 +34,7 @@ public class RegisterTeacherRequestDto {
             message = "email already exists"
     )
     @Email
+    @Trimmed
     private String email;
 
     @NotNull
@@ -40,9 +44,11 @@ public class RegisterTeacherRequestDto {
             message = "phone already exists"
     )
     @Pattern(regexp = "^\\d{9,}$", message = "phone number cannot be less than 9")
+    @Trimmed
     private String phone;
 
 
+    @Trimmed
     private String address;
 
     private List<UUID> classIds;

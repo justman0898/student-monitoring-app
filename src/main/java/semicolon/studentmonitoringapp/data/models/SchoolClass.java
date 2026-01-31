@@ -1,6 +1,7 @@
 package semicolon.studentmonitoringapp.data.models;
 
 import jakarta.persistence.*;
+import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import lombok.Getter;
 import lombok.Setter;
@@ -25,10 +26,12 @@ public class SchoolClass {
 
     @Column(nullable = false, updatable = false)
     @NotNull
+    @NotBlank
     private String name;
 
     @Column(nullable = false, updatable = false)
     @NotNull
+    @NotBlank
     private String academicYear;
 
     @Column(nullable = false)

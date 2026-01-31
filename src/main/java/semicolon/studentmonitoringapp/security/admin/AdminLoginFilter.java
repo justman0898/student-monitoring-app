@@ -37,8 +37,7 @@ public class AdminLoginFilter extends OncePerRequestFilter {
             log.info(loginRequestDto.toString());
             Boolean authenticated = authService.authenticate(loginRequestDto, response);
 
-            log.info("Login Request: {}",
-                    objectMapper.writeValueAsString(loginRequestDto));
+            
             log.info("Authenticated: {}", authenticated.toString());
 
             if (!authenticated) {

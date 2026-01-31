@@ -8,6 +8,7 @@ import lombok.Getter;
 import lombok.Setter;
 import semicolon.studentmonitoringapp.data.models.Parent;
 import semicolon.studentmonitoringapp.utils.annotations.ExistsInDb;
+import semicolon.studentmonitoringapp.utils.annotations.Trimmed;
 
 import java.util.List;
 import java.util.UUID;
@@ -16,9 +17,11 @@ import java.util.UUID;
 @Setter
 public class CreateParentRequestDto {
     @NotNull(message = "Cannot be empty")
+    @Trimmed
     private String firstName;
 
     @NotBlank(message = "Cannot be empty")
+    @Trimmed
     private String lastName;
 
     @NotBlank(message = "Cannot be empty")
@@ -27,9 +30,11 @@ public class CreateParentRequestDto {
     field = "email",
             message = "Email already exists"
     )
+    @Trimmed
     private String email;
 
     @NotBlank(message = "Provide an address")
+    @Trimmed
     private String address;
 
     @NotBlank(message = "phon field Cannot be empty")
@@ -38,6 +43,7 @@ public class CreateParentRequestDto {
             message = "Phone already exists"
     )
     @Pattern(regexp = "^\\d{9,}$", message = "phone number cannot be less than 9")
+    @Trimmed
     private String phone;
 
 

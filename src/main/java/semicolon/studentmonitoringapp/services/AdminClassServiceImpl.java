@@ -32,6 +32,7 @@ public class AdminClassServiceImpl implements AdminClassService {
 
     @Override
     public UUID createClass(CreateClassRequestDto classRequestDto) {
+        log.info("Request(Service layer): {}", objectMapper.writeValueAsString(classRequestDto));
         SchoolClass schoolClass = schoolClassMapper.toEntity(classRequestDto);
         checkForDuplicate(classRequestDto, schoolClass);
         List<Teacher> teachers = teacherRepository.findAllById(classRequestDto.getTeacherIds());

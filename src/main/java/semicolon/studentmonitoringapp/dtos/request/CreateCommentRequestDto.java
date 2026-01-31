@@ -4,6 +4,7 @@ import jakarta.validation.constraints.NotBlank;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
+import semicolon.studentmonitoringapp.utils.annotations.Trimmed;
 
 import java.util.UUID;
 
@@ -17,6 +18,7 @@ public class CreateCommentRequestDto {
     @NotBlank(
             message = "please enter a text"
     )
+    @Trimmed
     private String text;
     private UUID teacherId;
 
