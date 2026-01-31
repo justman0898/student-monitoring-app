@@ -12,6 +12,7 @@ import org.springframework.web.filter.OncePerRequestFilter;
 import semicolon.studentmonitoringapp.dtos.request.LoginRequestDto;
 import semicolon.studentmonitoringapp.services.AuthService;
 import semicolon.studentmonitoringapp.utils.Utility;
+import tools.jackson.databind.ObjectMapper;
 
 import java.io.IOException;
 
@@ -21,6 +22,7 @@ import java.io.IOException;
 public class AdminLoginFilter extends OncePerRequestFilter {
     private final Utility utility;
     private final AuthService authService;
+    private final ObjectMapper objectMapper;
 
     @Override
     protected void doFilterInternal(HttpServletRequest request,
@@ -35,6 +37,8 @@ public class AdminLoginFilter extends OncePerRequestFilter {
             log.info(loginRequestDto.toString());
             Boolean authenticated = authService.authenticate(loginRequestDto, response);
 
+            log.info("Login Request: {}",
+                    objectMapper.writeValueAsString(loginRequestDto));
             log.info("Authenticated: {}", authenticated.toString());
 
             if (!authenticated) {

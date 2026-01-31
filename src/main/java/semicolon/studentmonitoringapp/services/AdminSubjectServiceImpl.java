@@ -1,6 +1,7 @@
 package semicolon.studentmonitoringapp.services;
 
 import lombok.AllArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import semicolon.studentmonitoringapp.data.models.Subject;
@@ -8,23 +9,26 @@ import semicolon.studentmonitoringapp.data.repositories.SubjectRepository;
 import semicolon.studentmonitoringapp.dtos.request.CreateSubjectRequestDto;
 import semicolon.studentmonitoringapp.dtos.response.SubjectResponseDto;
 import semicolon.studentmonitoringapp.utils.mappers.SchoolClassMapper;
+import tools.jackson.databind.ObjectMapper;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
+@Slf4j
 @Service
 @AllArgsConstructor
 public class AdminSubjectServiceImpl implements AdminSubjectService {
     private final SubjectRepository subjectRepository;
     private final SchoolClassMapper schoolClassMapper;
-
+    private final ObjectMapper objectMapper;
 
     @Override
     public UUID createSubject(CreateSubjectRequestDto requestDto) {
         Subject subject = schoolClassMapper.toEntity(requestDto);
         Subject saved = subjectRepository.save(subject);
+        log.info(objectMapper.writeValueAsString(saved));
         return saved.getId();
     }
 

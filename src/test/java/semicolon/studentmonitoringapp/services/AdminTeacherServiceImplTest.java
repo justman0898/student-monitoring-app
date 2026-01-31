@@ -17,7 +17,9 @@ import semicolon.studentmonitoringapp.dtos.request.RegisterTeacherRequestDto;
 import semicolon.studentmonitoringapp.dtos.response.TeacherRegistrationDetailsDto;
 import semicolon.studentmonitoringapp.exceptions.NotFoundException;
 import semicolon.studentmonitoringapp.utils.mappers.SchoolClassMapper;
+import tools.jackson.databind.ObjectMapper;
 
+import java.time.Clock;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
@@ -35,7 +37,13 @@ class AdminTeacherServiceImplTest {
     TeacherRepository teacherRepository;
 
     @Mock
+    ObjectMapper objectMapper;
+
+    @Mock
     SchoolClassMapper mapper;
+
+    @Mock
+    Clock clock;
 
     @Mock
     SchoolClassRepository schoolClassRepository;

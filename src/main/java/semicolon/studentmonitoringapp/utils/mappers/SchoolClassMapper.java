@@ -43,4 +43,8 @@ public interface SchoolClassMapper {
     Subject toEntity(CreateSubjectRequestDto requestDto);
 
     SubjectResponseDto toDto(Subject subject);
+
+    Score toEntity(SubmitScoreRequestDto scoreRequestDto);
+
+    Comment toEntity(CreateCommentRequestDto commentRequestDto);
 }

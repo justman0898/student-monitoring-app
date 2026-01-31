@@ -1,18 +1,20 @@
 package semicolon.studentmonitoringapp.contollers;
 
-import com.github.fge.jsonpatch.JsonPatch;
+import org.springframework.http.ResponseEntity;
+import semicolon.studentmonitoringapp.dtos.request.CreateCommentRequestDto;
 import semicolon.studentmonitoringapp.dtos.request.SubmitScoreRequestDto;
+import semicolon.studentmonitoringapp.dtos.request.UpdateScoreRequestDto;
+import semicolon.studentmonitoringapp.dtos.response.IdResponse;
 
 import java.util.UUID;
 
 public interface TeacherAssessmentController {
 
 
-    void submitScore(SubmitScoreRequestDto submitScoreRequestDto);
-    void updateScore(UUID subjectId, JsonPatch jsonPatch);
-    void deleteScore(UUID subjectId,  JsonPatch jsonPatch);
-    void addSubjectComment(UUID subjectId, JsonPatch jsonPatch);
-    void addStudentComment(UUID studentId, JsonPatch jsonPatch);
+    ResponseEntity<IdResponse> submitScore(SubmitScoreRequestDto submitScoreRequestDto);
+    ResponseEntity<IdResponse> updateScore(UpdateScoreRequestDto requestDto);
+    ResponseEntity<?> deleteScore(UUID scoreId);
+    ResponseEntity<IdResponse> addComment(CreateCommentRequestDto commentRequest);
     void getAcademicHistory(UUID studentId);
 
 }

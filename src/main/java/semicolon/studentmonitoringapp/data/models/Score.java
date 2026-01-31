@@ -34,4 +34,11 @@ public class Score {
     @PositiveOrZero
     @NotNull
     private Integer score;
+
+    @NotNull
+    @Column(nullable = false)
+    private Boolean isActive = true;
+    private Instant deletedDate;
+    @Column(columnDefinition = "uuid")
+    private UUID deletedById;
 }

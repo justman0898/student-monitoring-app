@@ -34,8 +34,6 @@ public class AssessmentConfig {
     private Integer maxScore;
 
     @Positive
-    @Column(nullable = false)
-    @NotNull
     private Integer weight;
 
     @Column(nullable = false)

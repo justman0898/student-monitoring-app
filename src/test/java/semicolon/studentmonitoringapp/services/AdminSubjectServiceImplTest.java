@@ -11,6 +11,7 @@ import semicolon.studentmonitoringapp.data.repositories.SubjectRepository;
 import semicolon.studentmonitoringapp.dtos.request.CreateSubjectRequestDto;
 import semicolon.studentmonitoringapp.dtos.response.SubjectResponseDto;
 import semicolon.studentmonitoringapp.utils.mappers.SchoolClassMapper;
+import tools.jackson.databind.ObjectMapper;
 
 import java.util.List;
 import java.util.UUID;
@@ -31,6 +32,9 @@ class AdminSubjectServiceImplTest {
 
     @Mock
     SchoolClassMapper schoolClassMapper;
+
+    @Mock
+    ObjectMapper objectMapper;
 
     private Subject subject;
 
@@ -54,6 +58,7 @@ class AdminSubjectServiceImplTest {
         when(subjectRepository.save(any(Subject.class)))
                 .thenReturn(subject);
         when(schoolClassMapper.toEntity(requestDto)).thenReturn(subject);
+
 
         UUID createdSubjectID = subjectService.createSubject(requestDto);
         verify(subjectRepository).save(any(Subject.class));

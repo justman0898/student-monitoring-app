@@ -57,6 +57,7 @@ public class Teacher {
     @Column(nullable = false)
     @NotNull
     private Boolean isActive = true;
+    private Instant deletedAt;
 
 
 

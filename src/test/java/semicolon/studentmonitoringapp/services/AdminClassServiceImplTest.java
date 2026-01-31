@@ -14,6 +14,7 @@ import semicolon.studentmonitoringapp.dtos.response.ClassResponseDto;
 import semicolon.studentmonitoringapp.exceptions.NotFoundException;
 import semicolon.studentmonitoringapp.exceptions.SchoolClassDuplicateException;
 import semicolon.studentmonitoringapp.utils.mappers.SchoolClassMapper;
+import tools.jackson.databind.ObjectMapper;
 
 import java.util.*;
 
@@ -64,6 +65,9 @@ class AdminClassServiceImplTest {
 
     @Mock
     private SubjectRepository subjectRepository;
+
+    @Mock
+    ObjectMapper objectMapper;
 
     @Test
     void testThatCanCreateSchoolClass() {

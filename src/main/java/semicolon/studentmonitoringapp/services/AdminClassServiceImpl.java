@@ -1,6 +1,7 @@
 package semicolon.studentmonitoringapp.services;
 
 import lombok.AllArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import semicolon.studentmonitoringapp.data.models.*;
@@ -10,9 +11,11 @@ import semicolon.studentmonitoringapp.dtos.response.*;
 import semicolon.studentmonitoringapp.exceptions.NotFoundException;
 import semicolon.studentmonitoringapp.exceptions.SchoolClassDuplicateException;
 import semicolon.studentmonitoringapp.utils.mappers.SchoolClassMapper;
+import tools.jackson.databind.ObjectMapper;
 
 import java.util.*;
 
+@Slf4j
 @AllArgsConstructor
 @Service
 public class AdminClassServiceImpl implements AdminClassService {
@@ -24,6 +27,7 @@ public class AdminClassServiceImpl implements AdminClassService {
     private final AssessmentTypeRepository assessmentTypeRepository;
     private final AssessmentConfigRepository assessmentConfigRepository;
     private final SubjectRepository subjectRepository;
+    private final ObjectMapper objectMapper;
 
 
     @Override
@@ -35,8 +39,12 @@ public class AdminClassServiceImpl implements AdminClassService {
         schoolClass.setTeachers(new HashSet<>(teachers));
         schoolClass.setStudents(new HashSet<>(students));
         SchoolClass saved = classRepository.save(schoolClass);
+        logSaved(saved);
+
         return saved.getId();
     }
+
+
 
     @Override
     public List<ClassResponseDto> findAllSchoolClasses() {
@@ -51,6 +59,7 @@ public class AdminClassServiceImpl implements AdminClassService {
         getAllTeachersById(classPatchDto.getTeachers()).forEach(schoolClass::addTeacher);
         getAllStudentsById(classPatchDto.getStudents()).forEach(schoolClass::addStudent);
         classRepository.save(schoolClass);
+        log.info("Updated: {}", objectMapper.writeValueAsString(classPatchDto));
     }
 
     @Override
@@ -60,6 +69,9 @@ public class AdminClassServiceImpl implements AdminClassService {
         Teacher teacher = getTeacher(teacherId);
         schoolClass.removeTeacher(teacher);
         classRepository.save(schoolClass);
+        log.info("Removed Teacher :{} from class {}", 
+                objectMapper.writeValueAsString(teacher), 
+                objectMapper.writeValueAsString(schoolClass));
     }
 
     @Override
@@ -67,6 +79,8 @@ public class AdminClassServiceImpl implements AdminClassService {
         SchoolClass schoolClass = getSchoolClass(classId);
         schoolClass.setIsActive(false);
         classRepository.save(schoolClass);
+        log.info("Deactivated: {}", 
+                objectMapper.writeValueAsString(schoolClass));
     }
 
     @Override
@@ -76,6 +90,8 @@ public class AdminClassServiceImpl implements AdminClassService {
         List<Student> students = studentRepository.findAllById(createParentRequestDto.getStudentIds());
         parent.setStudents(new HashSet<>(students));
         Parent saved = parentRepository.save(parent);
+        log.info("Created Parent: {}",
+                objectMapper.writeValueAsString(saved));
         return saved.getId();
     }
 
@@ -84,6 +100,8 @@ public class AdminClassServiceImpl implements AdminClassService {
         AssessmentType assessmentType = schoolClassMapper.toEntity(assessmentTypeRequestDto);
         assessmentType.setCode(assessmentTypeRequestDto.getCode().toUpperCase().trim());
         AssessmentType saved = assessmentTypeRepository.save(assessmentType);
+        log.info("Created AssessmentType: {}",
+                objectMapper.writeValueAsString(saved));
         return saved.getId();
     }
 
@@ -91,6 +109,8 @@ public class AdminClassServiceImpl implements AdminClassService {
     public UUID createAssessmentConfig(CreateAssessmentConfigRequestDto assessmentConfigRequestDto) {
         AssessmentConfig assessmentConfig = mapAssessmentConfigToEntity(assessmentConfigRequestDto);
         AssessmentConfig saved = assessmentConfigRepository.save(assessmentConfig);
+        log.info("Created Assessment Configuration: {}",
+                objectMapper.writeValueAsString(saved));
         return saved.getId();
     }
 
@@ -107,6 +127,23 @@ public class AdminClassServiceImpl implements AdminClassService {
                 .stream().map(schoolClassMapper::toDto)
                 .toList();
     }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
     private AssessmentConfig mapAssessmentConfigToEntity(CreateAssessmentConfigRequestDto assessmentConfigRequestDto) {
@@ -134,6 +171,10 @@ public class AdminClassServiceImpl implements AdminClassService {
     private SchoolClass getSchoolClass(UUID classId) {
         return classRepository.findById(classId)
                 .orElseThrow(()-> new NotFoundException("Class Not Found"));
+    }
+
+    private void logSaved(SchoolClass saved) {
+        log.info("Saved {}",objectMapper.writeValueAsString(saved));
     }
 
     private List<Student> getAllStudentsById(Set<UUID> studentIds) {

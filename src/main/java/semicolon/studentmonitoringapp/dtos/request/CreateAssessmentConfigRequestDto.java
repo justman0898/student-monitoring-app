@@ -18,7 +18,7 @@ public class CreateAssessmentConfigRequestDto {
 
     @NotNull
     private Integer maxScore;
-    @NotNull
+
     private Integer weight;
     @NotBlank
     private String academicYear;

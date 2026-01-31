@@ -15,7 +15,10 @@ import semicolon.studentmonitoringapp.dtos.response.TeacherResponseDto;
 import semicolon.studentmonitoringapp.exceptions.NotFoundException;
 import semicolon.studentmonitoringapp.utils.Utility;
 import semicolon.studentmonitoringapp.utils.mappers.SchoolClassMapper;
+import tools.jackson.databind.ObjectMapper;
 
+import java.time.Clock;
+import java.time.Instant;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -27,7 +30,8 @@ public class AdminTeacherServiceImpl implements AdminTeacherService {
     private final SchoolClassMapper mapper;
     private final PasswordEncoder passwordEncoder;
     private final SchoolClassRepository schoolClassRepository;
-
+    private final ObjectMapper objectMapper;
+    private final Clock clock;
 
     @Override
     public TeacherRegistrationDetailsDto registerTeacher(RegisterTeacherRequestDto registerRequestDto) {
@@ -54,6 +58,9 @@ public class AdminTeacherServiceImpl implements AdminTeacherService {
     public UUID removeTeacher(UUID teacherId) {
         Teacher found = getTeacher(teacherId);
         found.setIsActive(false);
+        found.setDeletedAt(Instant.now(clock));
+        log.info("Removing teacher : {}",
+                objectMapper.writeValueAsString(found));
         return found.getId();
     }
 
@@ -61,6 +68,8 @@ public class AdminTeacherServiceImpl implements AdminTeacherService {
     @Transactional
     public TeacherResponseDto findTeacher(UUID teacherId){
         Teacher found = getTeacher(teacherId);
+        log.info("Getting Teacher: {}",
+                objectMapper.writeValueAsString(found));
         return mapTeacherEntityToResponse(found);
 
     }
