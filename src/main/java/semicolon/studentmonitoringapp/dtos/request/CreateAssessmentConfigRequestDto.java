@@ -16,10 +16,10 @@ public class CreateAssessmentConfigRequestDto {
     private UUID schoolClassId;
     private UUID assessmentTypeId;
 
-    @NotNull
+    @NotNull(message = "please enter a value")
     private Integer maxScore;
 
     private Integer weight;
-    @NotBlank
+    @NotBlank(message = "please enter an academic year")
     private String academicYear;
 }

@@ -28,6 +28,7 @@ public class TeacherLoginFilter extends OncePerRequestFilter {
                 HttpMethod.POST.matches(request.getMethod())){
 
             if (performFilter(request, response, utility, log, authService)) return;
+            return;
         }
         filterChain.doFilter(request, response);
     }

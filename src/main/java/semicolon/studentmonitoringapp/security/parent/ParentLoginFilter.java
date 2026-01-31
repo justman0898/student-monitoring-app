@@ -30,6 +30,7 @@ public class ParentLoginFilter extends OncePerRequestFilter {
                 HttpMethod.POST.matches(request.getMethod())){
 
             if (TeacherLoginFilter.performFilter(request, response, utility, log, authService)) return;
+            return;
         }
         filterChain.doFilter(request, response);
     }

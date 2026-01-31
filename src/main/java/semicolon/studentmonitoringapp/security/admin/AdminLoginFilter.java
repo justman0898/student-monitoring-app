@@ -48,6 +48,7 @@ public class AdminLoginFilter extends OncePerRequestFilter {
                 response.getWriter().flush();
                 return;
             }
+            return;
 
         }
         filterChain.doFilter(request, response);

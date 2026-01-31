@@ -11,10 +11,10 @@ import java.util.UUID;
 @Getter
 @Setter
 public class CreateClassRequestDto {
-    @NotNull
+    @NotNull(message = "Enter a class name")
     private String className;
 
-    @NotNull
+    @NotNull(message = "enter an academic year")
     private String academicYear;
 
 

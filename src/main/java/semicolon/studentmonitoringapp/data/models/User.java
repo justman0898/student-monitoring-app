@@ -20,7 +20,7 @@ public class User {
     @Column(unique = true, nullable = false, columnDefinition = "uuid", updatable = false)
     private UUID id;
 
-    @Column(nullable = false)
+    @Column(nullable = false, unique = true)
     @NotNull
     private String email;
 

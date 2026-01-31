@@ -29,10 +29,10 @@ public class CreateParentRequestDto {
     )
     private String email;
 
-    @NotBlank(message = "Cannot be empty")
+    @NotBlank(message = "Provide an address")
     private String address;
 
-    @NotBlank(message = "Cannot be empty")
+    @NotBlank(message = "phon field Cannot be empty")
     @ExistsInDb(entity = Parent.class,
             field = "phone",
             message = "Phone already exists"

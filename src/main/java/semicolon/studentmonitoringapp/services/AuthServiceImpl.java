@@ -8,11 +8,20 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import semicolon.studentmonitoringapp.data.models.Role;
+import semicolon.studentmonitoringapp.data.models.User;
+import semicolon.studentmonitoringapp.data.repositories.UserRepository;
 import semicolon.studentmonitoringapp.dtos.request.LoginRequestDto;
+import semicolon.studentmonitoringapp.dtos.request.RegisterUserRequestDto;
 import semicolon.studentmonitoringapp.security.CustomUserDetails;
 import semicolon.studentmonitoringapp.security.JwtProvider;
 import semicolon.studentmonitoringapp.security.UserPrincipal;
+import semicolon.studentmonitoringapp.utils.mappers.SchoolClassMapper;
 import tools.jackson.databind.ObjectMapper;
+
+import java.util.HashSet;
+import java.util.Set;
+import java.util.UUID;
 
 @Service
 @Slf4j
@@ -22,6 +31,8 @@ public class AuthServiceImpl implements AuthService {
     private final PasswordEncoder passwordEncoder;
     private final JwtProvider jwtProvider;
     private final ObjectMapper objectMapper;
+    private final UserRepository userRepository;
+    private final SchoolClassMapper schoolClassMapper;
 
     public Boolean authenticate(LoginRequestDto loginRequestDto, HttpServletResponse httpServletResponse) {
         try {
@@ -35,10 +46,26 @@ public class AuthServiceImpl implements AuthService {
             String token = jwtProvider.generateToken(user);
 
             httpServletResponse.setHeader("Authorization", "Bearer " + token);
+            httpServletResponse.setStatus(HttpServletResponse.SC_OK);
             return true;
         }catch (UsernameNotFoundException e){
             log.info("Error: {}",  e.getMessage());
             return false;
         }
     }
+
+    @Override
+    public UUID register(RegisterUserRequestDto registerUserRequestDto) {
+        User user = schoolClassMapper.toEntity(registerUserRequestDto);
+        user.setPassword(passwordEncoder.encode(registerUserRequestDto.getPassword()));
+        Set<Role> roles = new HashSet<>();
+        roles.add(Role.ADMIN);
+        user.setRoles(roles);
+        userRepository.save(user);
+        log.info("New user created: {}",
+                objectMapper.writeValueAsString(user));
+        return user.getId();
+    }
+
+
 }

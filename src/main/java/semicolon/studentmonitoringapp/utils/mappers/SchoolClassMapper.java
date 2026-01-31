@@ -47,4 +47,7 @@ public interface SchoolClassMapper {
     Score toEntity(SubmitScoreRequestDto scoreRequestDto);
 
     Comment toEntity(CreateCommentRequestDto commentRequestDto);
+
+    @Mapping(target = "password", ignore = true)
+    User toEntity(RegisterUserRequestDto registerUserRequestDto);
 }

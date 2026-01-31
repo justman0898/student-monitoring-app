@@ -11,17 +11,17 @@ import java.util.UUID;
 @Setter
 public class SubmitScoreRequestDto {
 
-    @NotNull
+    @NotNull(message = "please enter a student Id")
     private UUID studentId;
 
-    @NotNull
+    @NotNull(message = "please enter a teacher Id")
     private UUID teacherId;
 
-    @NotNull
+    @NotNull(message = "please enter a config Id")
     private UUID assessmentConfigId;
 
-    @PositiveOrZero
-    @NotNull
+    @PositiveOrZero(message = "enter a valid score")
+    @NotNull(message = "score cannot be blank")
     private Integer score;
 
 
