@@ -1,29 +1,60 @@
 import axios from 'axios'
 
 const api = axios.create({
-  baseURL: '/api',
+  baseURL: '/api/v1',
   headers: {
     'Content-Type': 'application/json'
   }
 })
 
+// Add request interceptor to include auth token
+api.interceptors.request.use(
+  (config) => {
+    const token = localStorage.getItem('token')
+    if (token) {
+      config.headers.Authorization = `Bearer ${token}`
+    }
+    return config
+  },
+  (error) => {
+    return Promise.reject(error)
+  }
+)
+
+// Add response interceptor to handle auth errors
+api.interceptors.response.use(
+  (response) => response,
+  (error) => {
+    if (error.response?.status === 401) {
+      localStorage.removeItem('token')
+      localStorage.removeItem('user')
+      window.location.href = '/login'
+    }
+    return Promise.reject(error)
+  }
+)
+
 // Admin Class APIs
 export const classAPI = {
-  createClass: (data) => api.post('/admin/classes', data),
+  createClass: (data) => api.post('/admin/classes/create', data),
   getAllClasses: () => api.get('/admin/classes'),
   updateClass: (classId, patch) => api.patch(`/admin/classes/${classId}`, patch),
-  deleteClass: (classId) => api.delete(`/admin/classes/${classId}`),
+  deleteClass: (classId) => api.delete(`/admin/classes/de-activate/${classId}`),
   assignTeacher: (classId, teacherId) => api.post(`/admin/classes/${classId}/assign/${teacherId}`),
-  unassignTeacher: (teacherId) => api.post(`/admin/classes/unassign/${teacherId}`),
-  addParent: (data) => api.post('/admin/classes/parents', data)
+  unassignTeacher: (classId, teacherId) => api.patch(`/admin/classes/${classId}/un-assign/${teacherId}`),
+  addParent: (data) => api.post('/admin/classes/create-parent', data),
+  createAssessmentType: (data) => api.post('/admin/classes/assessment-type', data),
+  createAssessmentConfig: (data) => api.post('/admin/classes/assessment-config', data),
+  getAssessmentType: (assessmentTypeId) => api.get(`/admin/classes/${assessmentTypeId}`),
+  getAllAssessmentTypes: () => api.get('/admin/classes/assessment-types')
 }
 
 // Admin Teacher APIs
 export const teacherAPI = {
-  registerTeacher: (data) => api.post('/admin/teachers/register', data),
-  getTeachers: () => api.get('/admin/teachers'),
-  getTeacher: (teacherId) => api.get(`/admin/teachers/${teacherId}`),
-  removeTeacher: (teacherId) => api.delete(`/admin/teachers/${teacherId}`)
+  registerTeacher: (data) => api.post('/teachers', data),
+  getTeachers: () => api.get('/teachers'),
+  getTeacher: (teacherId) => api.get(`/teachers/${teacherId}`),
+  removeTeacher: (teacherId) => api.delete(`/teachers/${teacherId}`)
 }
 
 // Subject APIs
@@ -36,24 +67,29 @@ export const subjectAPI = {
 
 // Parent APIs
 export const parentAPI = {
-  getLinkedStudents: (parentId) => api.get(`/parents/${parentId}/students`),
-  viewResults: (studentId) => api.get(`/parents/students/${studentId}/results`)
+  getLinkedStudents: (parentId) => api.get(`/parent/students/${parentId}`),
+  viewResults: (studentId) => api.get(`/parent/${studentId}`)
 }
 
 // Teacher Assessment APIs
 export const assessmentAPI = {
-  submitScore: (data) => api.post('/teacher/assessments/scores', data),
-  updateScore: (subjectId, patch) => api.patch(`/teacher/assessments/scores/${subjectId}`, patch),
-  deleteScore: (subjectId, patch) => api.delete(`/teacher/assessments/scores/${subjectId}`, { data: patch }),
-  addSubjectComment: (subjectId, patch) => api.patch(`/teacher/assessments/subjects/${subjectId}/comment`, patch),
-  addStudentComment: (studentId, patch) => api.patch(`/teacher/assessments/students/${studentId}/comment`, patch),
-  getAcademicHistory: (studentId) => api.get(`/teacher/assessments/students/${studentId}/history`)
+  submitScore: (data) => api.post('/teachers/submit', data),
+  updateScore: (patch) => api.patch('/teachers/update-score', patch),
+  deleteScore: (scoreId) => api.delete(`/teachers/delete/${scoreId}`),
+  addComment: (data) => api.post('/teachers/comment', data),
+  getAcademicHistory: (studentId) => api.get(`/teachers/${studentId}/academic-history`)
 }
 
 // Analysis APIs
 export const analysisAPI = {
   getPerformanceHistory: (studentId) => api.get(`/analysis/students/${studentId}/performance`),
-  getWeakSubjects: (studentId) => api.get(`/analysis/students/${studentId}/weak-subjects`)
+  getWeakSubjects: (studentId) => api.get(`/analysis/weak-subjects`)
+}
+
+// Authentication APIs
+export const authAPI = {
+  register: (data) => api.post('/auth/register', data),
+  login: (data) => api.post('/auth/login', data)
 }
 
 export default api

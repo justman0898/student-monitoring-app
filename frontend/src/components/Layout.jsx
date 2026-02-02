@@ -1,20 +1,30 @@
 import { useState } from 'react'
-import { Link, useLocation } from 'react-router-dom'
-import { Menu, X, Home, Users, BookOpen, GraduationCap, UserPlus, ClipboardList, BarChart3 } from 'lucide-react'
+import { Link, useLocation, useNavigate } from 'react-router-dom'
+import { Menu, X, Home, Users, BookOpen, GraduationCap, UserPlus, ClipboardList, BarChart3, Settings, LogOut } from 'lucide-react'
 
 const Layout = ({ children }) => {
   const [sidebarOpen, setSidebarOpen] = useState(false)
   const location = useLocation()
+  const navigate = useNavigate()
 
   const navigation = [
-    { name: 'Dashboard', href: '/', icon: Home },
+    { name: 'Dashboard', href: '/dashboard', icon: Home },
     { name: 'Teachers', href: '/teachers', icon: Users },
     { name: 'Classes', href: '/classes', icon: GraduationCap },
     { name: 'Subjects', href: '/subjects', icon: BookOpen },
     { name: 'Parents', href: '/parents', icon: UserPlus },
     { name: 'Assessments', href: '/assessments', icon: ClipboardList },
+    { name: 'Assessment Config', href: '/assessment-config', icon: Settings },
     { name: 'Analytics', href: '/analytics', icon: BarChart3 }
   ]
+
+  const handleLogout = () => {
+    localStorage.removeItem('token')
+    localStorage.removeItem('user')
+    navigate('/login')
+  }
+
+  const user = JSON.parse(localStorage.getItem('user') || '{}')
 
   return (
     <div className="min-h-screen bg-gray-50">
@@ -38,7 +48,7 @@ const Layout = ({ children }) => {
             <X className="w-6 h-6" />
           </button>
         </div>
-        <nav className="p-4 space-y-2">
+        <nav className="p-4 space-y-2 flex-1">
           {navigation.map((item) => {
             const Icon = item.icon
             const isActive = location.pathname === item.href
@@ -61,6 +71,17 @@ const Layout = ({ children }) => {
             )
           })}
         </nav>
+        
+        {/* Logout button at bottom of sidebar */}
+        <div className="p-4 border-t">
+          <button
+            onClick={handleLogout}
+            className="flex items-center gap-3 px-4 py-3 w-full text-left text-red-600 hover:bg-red-50 rounded-lg transition-colors"
+          >
+            <LogOut className="w-5 h-5" />
+            <span className="font-medium">Logout</span>
+          </button>
+        </div>
       </aside>
 
       {/* Main content */}
@@ -77,11 +98,13 @@ const Layout = ({ children }) => {
             <div className="flex-1 lg:flex-none" />
             <div className="flex items-center gap-4">
               <div className="text-right hidden sm:block">
-                <p className="text-sm font-medium text-gray-900">Admin User</p>
-                <p className="text-xs text-gray-500">Administrator</p>
+                <p className="text-sm font-medium text-gray-900">
+                  {user.firstName ? `${user.firstName} ${user.lastName}` : 'User'}
+                </p>
+                <p className="text-xs text-gray-500">{user.role || 'Administrator'}</p>
               </div>
               <div className="w-10 h-10 rounded-full bg-primary flex items-center justify-center text-white font-semibold">
-                A
+                {user.firstName ? user.firstName.charAt(0).toUpperCase() : 'U'}
               </div>
             </div>
           </div>
