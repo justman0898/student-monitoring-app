@@ -6,7 +6,7 @@ import lombok.Setter;
 
 @Getter
 @Setter
-public class TeacherRegistrationDetailsDto {
+public class RegistrationDetailsDto {
 
     private String email;
     private String generatedPassword;

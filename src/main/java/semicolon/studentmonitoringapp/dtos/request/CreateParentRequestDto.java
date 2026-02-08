@@ -10,6 +10,7 @@ import semicolon.studentmonitoringapp.data.models.Parent;
 import semicolon.studentmonitoringapp.utils.annotations.ExistsInDb;
 import semicolon.studentmonitoringapp.utils.annotations.Trimmed;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
@@ -18,6 +19,7 @@ import java.util.UUID;
 public class CreateParentRequestDto {
     @NotNull(message = "Cannot be empty")
     @Trimmed
+    @NotBlank
     private String firstName;
 
     @NotBlank(message = "Cannot be empty")
@@ -47,10 +49,10 @@ public class CreateParentRequestDto {
     private String phone;
 
 
-    private List<UUID> studentIds;
+    private List<UUID> studentIds = new ArrayList<>();
 
     private Boolean notificationEnabled;
 
-
+    @Trimmed
     private String preferredLanguage;
 }

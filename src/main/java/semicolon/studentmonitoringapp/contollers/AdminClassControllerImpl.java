@@ -63,14 +63,26 @@ public class AdminClassControllerImpl implements AdminClassController {
     @Override
     @PostMapping("/create-parent")
     public ResponseEntity<?> addParent(@Valid @RequestBody CreateParentRequestDto createParentRequestDto) {
-        UUID parentId = classService.createParentProfile(createParentRequestDto);
+        classService.createParentProfile(createParentRequestDto);
         return ResponseEntity
                 .status(HttpStatus.CREATED)
-                .body(new IdResponse(parentId));
+                .body(new IdResponse(UUID.randomUUID()));
     }
 
     @Override
-    @PostMapping("assessment-type")
+    @PatchMapping("/update-parent")
+    public ResponseEntity<IdResponse> updateParent(
+            @Valid
+            @RequestBody
+            UpdateParentRequestDto updateParentDto) {
+        UUID updated = classService.updateParent(updateParentDto);
+        return ResponseEntity
+                .status(HttpStatus.NO_CONTENT)
+                .body(new IdResponse(updated));
+    }
+
+    @Override
+    @PostMapping("/assessment-type")
     public ResponseEntity<IdResponse> createAssessmentType(@Valid @RequestBody CreateAssessmentTypeRequestDto createAssessmentTypeRequestDto) {
         UUID assessmentTypeId = classService.createAssessmentType(createAssessmentTypeRequestDto);
         return ResponseEntity
@@ -79,7 +91,7 @@ public class AdminClassControllerImpl implements AdminClassController {
     }
 
     @Override
-    @PostMapping("assessment-config")
+    @PostMapping("/assessment-config")
     public ResponseEntity<IdResponse> createAssessmentConfig(CreateAssessmentConfigRequestDto createAssessmentConfigRequestDto) {
         UUID assessmentConfigId = classService.createAssessmentConfig(createAssessmentConfigRequestDto);
         return ResponseEntity
@@ -98,11 +110,24 @@ public class AdminClassControllerImpl implements AdminClassController {
     }
 
     @Override
-    @GetMapping("assessment-types")
+    @GetMapping("/assessment-types")
     public ResponseEntity<?> getAllAssessmentTypes() {
         return ResponseEntity.ok()
                 .contentType(MediaType.APPLICATION_JSON)
                 .body(classService.getAllAssessmentTypes());
+    }
+
+    @Override
+    @PostMapping("/students")
+    public ResponseEntity<IdResponse> registerStudent(
+            @Valid
+            @RequestBody
+            CreateStudentRequestDto createStudentRequestDto) {
+        UUID registeredId = classService.registerStudent(createStudentRequestDto);
+
+        return ResponseEntity
+                .status(HttpStatus.CREATED)
+                .body(new IdResponse(registeredId));
     }
 
 

@@ -1,15 +1,14 @@
 package semicolon.studentmonitoringapp.dtos.request;
 
-import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.NotNull;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
-import semicolon.studentmonitoringapp.security.config.StringTrimDeserializer;
 import semicolon.studentmonitoringapp.utils.annotations.Trimmed;
+import semicolon.studentmonitoringapp.utils.annotations.ValidAcademicYear;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
@@ -23,13 +22,15 @@ public class CreateClassRequestDto {
 
     @NotBlank(message = "enter an academic year")
     @Trimmed
+    @ValidAcademicYear
     private String academicYear;
 
 
-    private List<UUID> teacherIds;
+    @NotNull
+    private List<UUID> teacherIds = new ArrayList<>();
 
-
-    private List<UUID> studentIds;
+    @NotNull
+    private List<UUID> studentIds = new ArrayList<>();
 
 
 

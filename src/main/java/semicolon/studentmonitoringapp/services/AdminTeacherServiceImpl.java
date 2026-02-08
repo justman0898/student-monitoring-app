@@ -5,16 +5,19 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import semicolon.studentmonitoringapp.data.models.Role;
 import semicolon.studentmonitoringapp.data.models.SchoolClass;
 import semicolon.studentmonitoringapp.data.models.Teacher;
 import semicolon.studentmonitoringapp.data.repositories.SchoolClassRepository;
 import semicolon.studentmonitoringapp.data.repositories.TeacherRepository;
+import semicolon.studentmonitoringapp.dtos.request.RegisterEventDto;
 import semicolon.studentmonitoringapp.dtos.request.RegisterTeacherRequestDto;
-import semicolon.studentmonitoringapp.dtos.response.TeacherRegistrationDetailsDto;
+import semicolon.studentmonitoringapp.dtos.response.RegistrationDetailsDto;
 import semicolon.studentmonitoringapp.dtos.response.TeacherResponseDto;
 import semicolon.studentmonitoringapp.exceptions.NotFoundException;
 import semicolon.studentmonitoringapp.utils.Utility;
 import semicolon.studentmonitoringapp.utils.mappers.SchoolClassMapper;
+import semicolon.studentmonitoringapp.utils.messaging.RegisteredEventPublisher;
 import tools.jackson.databind.ObjectMapper;
 
 import java.time.Clock;
@@ -32,9 +35,10 @@ public class AdminTeacherServiceImpl implements AdminTeacherService {
     private final SchoolClassRepository schoolClassRepository;
     private final ObjectMapper objectMapper;
     private final Clock clock;
+    private RegisteredEventPublisher teacherRegisteredEvent;
 
     @Override
-    public TeacherRegistrationDetailsDto registerTeacher(RegisterTeacherRequestDto registerRequestDto) {
+    public RegistrationDetailsDto registerTeacher(RegisterTeacherRequestDto registerRequestDto) {
         return mapRequestToResponse(registerRequestDto);
     }
 
@@ -107,16 +111,25 @@ public class AdminTeacherServiceImpl implements AdminTeacherService {
                 .toList();
     }
 
-    private TeacherRegistrationDetailsDto mapRequestToResponse(RegisterTeacherRequestDto registerRequestDto) {
+    private RegistrationDetailsDto mapRequestToResponse(RegisterTeacherRequestDto registerRequestDto) {
         Teacher teacher = mapper.toEntity(registerRequestDto);
-        String hashedPassword = passwordEncoder.encode(Utility.generateTeacherPassword());
+        String password = Utility.generateTeacherPassword();
+        String hashedPassword = passwordEncoder.encode(password);
         teacher.setGeneratedPassword(hashedPassword);
         List<SchoolClass> schoolClasses = schoolClassRepository.findAllById(registerRequestDto.getClassIds());
         teacher.setSchoolClasses(new HashSet<>(schoolClasses));
         Teacher saved = teacherRepository.save(teacher);
+
+        RegisterEventDto registerEventDto = mapper.teacherToRegisterEventDto(saved);
+        Set<Role> roles = new HashSet<>();
+        roles.add(Role.TEACHER);
+        registerEventDto.setRoles(roles);
+        teacherRegisteredEvent.broadcastEvent(registerEventDto);
+
+
         log.info("Saved teacher : {}", saved);
-        TeacherRegistrationDetailsDto registrationDetailsDto = new TeacherRegistrationDetailsDto();
-        registrationDetailsDto.setGeneratedPassword(teacher.getGeneratedPassword());
+        RegistrationDetailsDto registrationDetailsDto = new RegistrationDetailsDto();
+        registrationDetailsDto.setGeneratedPassword(password);
         registrationDetailsDto.setEmail(teacher.getEmail());
         return registrationDetailsDto;
     }

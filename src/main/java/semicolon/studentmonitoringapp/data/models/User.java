@@ -4,6 +4,8 @@ import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
 import lombok.Getter;
 import lombok.Setter;
+import lombok.ToString;
+import org.hibernate.annotations.UuidGenerator;
 
 import java.util.Set;
 import java.util.UUID;
@@ -11,13 +13,15 @@ import java.util.UUID;
 @Getter
 @Setter
 @Entity
+@ToString
 @Table(
         name = "users"
 )
 public class User {
     @Id
     @GeneratedValue
-    @Column(unique = true, nullable = false, columnDefinition = "uuid", updatable = false)
+    @UuidGenerator
+    @Column(nullable = false, updatable = false)
     private UUID id;
 
     @Column(nullable = false, unique = true)

@@ -43,6 +43,10 @@ public class Parent {
     @NotNull
     private Gender gender;
 
+    @Column(nullable = false)
+    @NotNull
+    private String generatedPassword;
+
     @ManyToMany(fetch = FetchType.LAZY)
     @JoinTable(
             name = "student_parent",

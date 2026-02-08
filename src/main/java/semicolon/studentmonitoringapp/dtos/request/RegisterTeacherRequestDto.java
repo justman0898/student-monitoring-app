@@ -12,6 +12,7 @@ import semicolon.studentmonitoringapp.data.models.Teacher;
 import semicolon.studentmonitoringapp.utils.annotations.ExistsInDb;
 import semicolon.studentmonitoringapp.utils.annotations.Trimmed;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
@@ -51,7 +52,7 @@ public class RegisterTeacherRequestDto {
     @Trimmed
     private String address;
 
-    private List<UUID> classIds;
+    private List<UUID> classIds = new ArrayList<>();
 
     @NotNull
     private Gender gender;

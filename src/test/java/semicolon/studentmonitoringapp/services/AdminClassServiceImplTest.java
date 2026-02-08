@@ -7,16 +7,22 @@ import org.mockito.Captor;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import semicolon.studentmonitoringapp.data.models.*;
 import semicolon.studentmonitoringapp.data.repositories.*;
 import semicolon.studentmonitoringapp.dtos.request.*;
 import semicolon.studentmonitoringapp.dtos.response.ClassResponseDto;
+import semicolon.studentmonitoringapp.dtos.response.RegistrationDetailsDto;
 import semicolon.studentmonitoringapp.exceptions.NotFoundException;
 import semicolon.studentmonitoringapp.exceptions.SchoolClassDuplicateException;
+import semicolon.studentmonitoringapp.utils.Utility;
 import semicolon.studentmonitoringapp.utils.mappers.SchoolClassMapper;
+import semicolon.studentmonitoringapp.utils.messaging.RegisteredEventPublisher;
 import tools.jackson.databind.ObjectMapper;
 
+import java.sql.Array;
 import java.util.*;
+import java.util.stream.Collectors;
 
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 import static org.junit.jupiter.api.Assertions.*;
@@ -67,7 +73,16 @@ class AdminClassServiceImplTest {
     private SubjectRepository subjectRepository;
 
     @Mock
+    private RegisteredEventPublisher registeredEventPublisher;
+
+    @Mock
     ObjectMapper objectMapper;
+
+    @Mock
+    PasswordEncoder passwordEncoder;
+
+    @Captor
+    private ArgumentCaptor<Student> studentArgumentCaptor;
 
     @Test
     void testThatCanCreateSchoolClass() {
@@ -293,16 +308,36 @@ class AdminClassServiceImplTest {
         parent_1.setFirstName("test");
         parent_1.setStudents(Set.of(student));
 
-        when(schoolClassMapper.toEntity(any(CreateParentRequestDto.class))).thenReturn(parent_1);
-        when(studentRepository.findAllById(any())).thenReturn(List.of(student));
-        when(parentRepository.save(any(Parent.class))).thenReturn(parent_1);
 
-        adminClassService.createParentProfile(createParentRequestDto);
+
+        when(schoolClassMapper.toEntity(any(CreateParentRequestDto.class)))
+                .thenReturn(parent_1);
+        when(studentRepository.findAllById(any()))
+                .thenReturn(List.of(student));
+        when(schoolClassMapper.parentToRegisterEventDto(any()))
+                .thenReturn(new RegisterEventDto());
+
+
+
+        RegistrationDetailsDto registrationDetailsDto = adminClassService.createParentProfile(createParentRequestDto);
+        assertThat(registrationDetailsDto).isNotNull();
+        assertThat(registrationDetailsDto.getGeneratedPassword())
+                .isNotBlank();
+
+
         verify(parentRepository).save(parentArgumentCaptor.capture());
 
         assertThat(parentArgumentCaptor.getValue()).isNotNull();
-        assertThat(parentArgumentCaptor.getValue().getFirstName()).isEqualTo(createParentRequestDto.getFirstName());
-        assertThat(parentArgumentCaptor.getValue().getStudents().size()).isEqualTo(1);
+        assertThat(parentArgumentCaptor.getValue()
+                .getFirstName())
+                .isEqualTo(createParentRequestDto.getFirstName());
+        assertThat(parentArgumentCaptor.getValue()
+                .getStudents().size())
+                .isEqualTo(1);
+        assertThat(parentArgumentCaptor.getValue()
+                .getGeneratedPassword())
+                .isEqualTo(parent_1.getGeneratedPassword());
+
 
     }
 
@@ -392,8 +427,173 @@ class AdminClassServiceImplTest {
         assertThrows(NotFoundException.class,
                 ()-> adminClassService.createAssessmentConfig(new CreateAssessmentConfigRequestDto()));
 
-
     }
+
+    @Test
+    void testThatCanUpdateParentPhoneNumber(){
+
+        UpdateParentRequestDto updateParentRequestDto = new UpdateParentRequestDto();
+        updateParentRequestDto.setPhone("09068325084");
+
+        Parent parent = new Parent();
+        parent.setId(UUID.randomUUID());
+        parent.setPhone("09066666666");
+
+        when(parentRepository.findById(any()))
+                .thenReturn(Optional.of(parent));
+
+
+
+        adminClassService.updateParent(updateParentRequestDto);
+
+        verify(parentRepository).save(parentArgumentCaptor.capture());
+
+        assertThat(parentArgumentCaptor.getValue()
+                .getPhone())
+                .isEqualTo(updateParentRequestDto.getPhone());
+    }
+
+    @Test
+    void testThatIfPhoneNumberWasNotProvided_does_not_overwrite(){
+
+        UpdateParentRequestDto updateParentRequestDto = new UpdateParentRequestDto();
+
+        Parent parent = new Parent();
+        parent.setId(UUID.randomUUID());
+        parent.setPhone("09066666666");
+
+        when(parentRepository.findById(any()))
+                .thenReturn(Optional.of(parent));
+
+        adminClassService.updateParent(updateParentRequestDto);
+
+        verify(parentRepository).save(parentArgumentCaptor.capture());
+
+        assertThat(parentArgumentCaptor.getValue()
+                .getPhone())
+                .isNotEqualTo(updateParentRequestDto.getPhone());
+    }
+
+    @Test
+    void testThatCanUpdateParentAddress(){
+        UpdateParentRequestDto updateParentRequestDto = new UpdateParentRequestDto();
+        updateParentRequestDto.setId(UUID.randomUUID());
+        updateParentRequestDto.setAddress("No 5 Iyana Ipaja");
+
+        Parent parent = new Parent();
+        parent.setId(updateParentRequestDto.getId());
+        parent.setAddress("No 5 Warmwood");
+
+        when(parentRepository.findById(any()))
+                .thenReturn(Optional.of(parent));
+
+        adminClassService.updateParent(updateParentRequestDto);
+
+        verify(parentRepository).save(parentArgumentCaptor.capture());
+        assertThat(parentArgumentCaptor.getValue()
+                .getAddress())
+                .isEqualTo(updateParentRequestDto.getAddress());
+    }
+
+    @Test
+    void testThatCurrentAddressDoesNotOverWrite_address_not_provided(){
+        UpdateParentRequestDto updateParentRequestDto = new UpdateParentRequestDto();
+        updateParentRequestDto.setId(UUID.randomUUID());
+
+        Parent parent = new Parent();
+        parent.setId(updateParentRequestDto.getId());
+        parent.setAddress("No 5 Warmwood");
+
+        when(parentRepository.findById(any()))
+                .thenReturn(Optional.of(parent));
+
+        adminClassService.updateParent(updateParentRequestDto);
+
+        verify(parentRepository).save(parentArgumentCaptor.capture());
+
+        assertThat(parentArgumentCaptor.getValue()
+                .getAddress())
+                .isNotEqualTo(updateParentRequestDto.getAddress());
+    }
+
+    @Test
+    void testThatCanAddStudentsToParents(){
+        UpdateParentRequestDto updateParentRequestDto = new UpdateParentRequestDto();
+        updateParentRequestDto.setId(UUID.randomUUID());
+        UUID studentId_1 = UUID.randomUUID();
+        UUID studentId_2 = UUID.randomUUID();
+        updateParentRequestDto.getStudentIds()
+                .addAll(List.of(studentId_1, studentId_2));
+
+        Parent parent = new Parent();
+        parent.setId(updateParentRequestDto.getId());
+        parent.setAddress("No 5 Warmwood");
+
+        Student student_1 = new Student();
+        student_1.setId(studentId_1);
+
+
+        Student student_2 = new Student();
+        student_2.setId(studentId_2);
+
+        List<Student> students = new ArrayList<>();
+        students.add(student_1);
+        students.add(student_2);
+
+        when(parentRepository.findById(any()))
+                .thenReturn(Optional.of(parent));
+        when(studentRepository.findAllById(any()))
+                .thenReturn(students);
+
+        adminClassService.updateParent(updateParentRequestDto);
+
+        verify(parentRepository).save(parentArgumentCaptor.capture());
+
+        assertThat(parentArgumentCaptor.getValue()
+                .getStudents())
+                .isNotNull();
+
+        assertThat(parentArgumentCaptor.getValue()
+                .getStudents().size())
+                .isEqualTo(updateParentRequestDto.getStudentIds().size());
+
+        assertThat(parentArgumentCaptor.getValue()
+                .getStudents()
+                .stream().anyMatch(student->
+                        student.getId().equals(studentId_1)))
+                .isTrue();
+
+        assertThat(parentArgumentCaptor.getValue()
+                .getStudents()
+                .stream().anyMatch(student->
+                        student.getId().equals(studentId_2)))
+                .isTrue();
+    }
+
+    @Test
+    void testThatCanRegisterNewStudent(){
+
+        CreateStudentRequestDto createStudentRequestDto = new  CreateStudentRequestDto();
+        createStudentRequestDto.setEmail("test@mail.com");
+
+        Student student = new Student();
+        student.setId(UUID.randomUUID());
+
+        when(schoolClassMapper.toEntity(createStudentRequestDto))
+                .thenReturn(student);
+
+        UUID saved = adminClassService.registerStudent(createStudentRequestDto);
+        assertThat(saved).isNotNull();
+
+        verify(studentRepository)
+                .save(studentArgumentCaptor.capture());
+
+        assertThat(studentArgumentCaptor.getValue()
+                .getId())
+                .isEqualTo(saved);
+    }
+
+
 
 
 

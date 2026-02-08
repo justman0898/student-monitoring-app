@@ -13,10 +13,12 @@ import semicolon.studentmonitoringapp.data.models.SchoolClass;
 import semicolon.studentmonitoringapp.data.models.Teacher;
 import semicolon.studentmonitoringapp.data.repositories.SchoolClassRepository;
 import semicolon.studentmonitoringapp.data.repositories.TeacherRepository;
+import semicolon.studentmonitoringapp.dtos.request.RegisterEventDto;
 import semicolon.studentmonitoringapp.dtos.request.RegisterTeacherRequestDto;
-import semicolon.studentmonitoringapp.dtos.response.TeacherRegistrationDetailsDto;
+import semicolon.studentmonitoringapp.dtos.response.RegistrationDetailsDto;
 import semicolon.studentmonitoringapp.exceptions.NotFoundException;
 import semicolon.studentmonitoringapp.utils.mappers.SchoolClassMapper;
+import semicolon.studentmonitoringapp.utils.messaging.RegisteredEventPublisher;
 import tools.jackson.databind.ObjectMapper;
 
 import java.time.Clock;
@@ -57,6 +59,9 @@ class AdminTeacherServiceImplTest {
     @Captor
     ArgumentCaptor<Teacher> teacherCaptor;
 
+    @Mock
+    RegisteredEventPublisher teacherRegisteredEvent;
+
 
     @Test
     void testThatCanRegisterTeacher() {
@@ -77,17 +82,23 @@ class AdminTeacherServiceImplTest {
         when(teacherRepository.save(any()))
                 .thenAnswer(i-> i.getArgument(0));
         when(mapper.toEntity(any(RegisterTeacherRequestDto.class)))
-        .thenReturn(teacher);
-        when(passwordEncoder.encode(any())).thenReturn("password");
+                .thenReturn(teacher);
+        when(passwordEncoder.encode(any()))
+                .thenReturn("password");
         when(schoolClassRepository.findAllById(any()))
                 .thenReturn(List.of(scc));
+        when(mapper.teacherToRegisterEventDto(any()))
+                .thenReturn(new RegisterEventDto());
 
-        TeacherRegistrationDetailsDto dto = adminTeacherService.registerTeacher(registerRequestDto);
+        RegistrationDetailsDto dto = adminTeacherService.registerTeacher(registerRequestDto);
 
         verify(teacherRepository).save(teacherCaptor.capture());
 
         assertThat(dto).isNotNull();
-        assertThat(dto.getGeneratedPassword()).isEqualTo(teacher.getGeneratedPassword());
+        assertThat(teacherCaptor.getValue()
+                .getGeneratedPassword())
+                .isEqualTo(teacher.getGeneratedPassword());
+
         assertThat(teacherCaptor
                 .getValue()
                 .getSchoolClasses()

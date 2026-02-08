@@ -12,8 +12,11 @@ import org.springframework.http.MediaType;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
+import semicolon.studentmonitoringapp.data.models.Gender;
 import semicolon.studentmonitoringapp.dtos.request.*;
 import semicolon.studentmonitoringapp.dtos.response.CreateAssessmentTypeResponseDto;
+import semicolon.studentmonitoringapp.security.CustomUserDetails;
+import semicolon.studentmonitoringapp.security.JwtProvider;
 import semicolon.studentmonitoringapp.services.AdminClassService;
 import semicolon.studentmonitoringapp.services.AuthService;
 import semicolon.studentmonitoringapp.utils.Utility;
@@ -56,6 +59,12 @@ class AdminClassControllerImplTest {
 
     @MockitoBean
     private UserDetailsService userDetailsService;
+
+    @MockitoBean
+    private JwtProvider jwtProvider;
+
+    @MockitoBean
+    private CustomUserDetails customUserDetails;
 
 
 
@@ -215,5 +224,62 @@ class AdminClassControllerImplTest {
 
 
     }
+
+    @Test
+    void testThatCanUpdateParent() throws Exception {
+        UpdateParentRequestDto updateParentRequestDto = new UpdateParentRequestDto();
+        updateParentRequestDto.setId(UUID.randomUUID());
+
+        when(classService.updateParent(any()))
+                .thenReturn(updateParentRequestDto.getId());
+
+        mockMvc.perform(patch("/api/v1/admin/classes/update-parent")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(updateParentRequestDto)))
+                .andExpect(status().isNoContent())
+                .andExpect(jsonPath("$.id").value(updateParentRequestDto.getId().toString()));
+
+    }
+
+    @Test
+    void testThatCanCreateStudent()throws Exception {
+        CreateStudentRequestDto createStudentRequestDto = new CreateStudentRequestDto();
+        createStudentRequestDto.setFirstName("Justice");
+        createStudentRequestDto.setLastName("Igboneme");
+        createStudentRequestDto.setEmail("test@test.com");
+        createStudentRequestDto.setGender(Gender.MALE);
+
+        UUID saved = UUID.randomUUID();
+
+        when(entityManager.createQuery(anyString(),eq(Long.class)))
+                .thenReturn(query);
+        when(query.setParameter(anyString(),any(String.class)))
+                .thenReturn(query);
+        when(query.getSingleResult()).thenReturn(0L);
+
+        when(classService.registerStudent(any()))
+                .thenReturn(saved);
+
+        mockMvc.perform(post("/api/v1/admin/classes/students")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(createStudentRequestDto)))
+                .andExpect(status().isCreated())
+                .andExpect(jsonPath("$.id").value(saved.toString()));
+    }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 }

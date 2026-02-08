@@ -32,6 +32,7 @@ public class AdminLoginFilter extends OncePerRequestFilter {
         String servletPath = request.getServletPath();
         String requestURI = "/api/v1/admin/login";
 
+
         if (requestURI.equals(servletPath) && HttpMethod.POST.matches(request.getMethod())) {
             LoginRequestDto loginRequestDto = utility.extractRequest(request);
             log.info(loginRequestDto.toString());

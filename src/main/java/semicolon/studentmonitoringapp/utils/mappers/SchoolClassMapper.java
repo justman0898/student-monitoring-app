@@ -29,6 +29,7 @@ public interface SchoolClassMapper {
 
     @Mapping(target = "students", ignore = true)
     @Mapping(target = "createdAt", ignore = true)
+    @Mapping(target = "generatedPassword", ignore = true)
     Parent toEntity(CreateParentRequestDto createParentRequestDto);
 
     @Mapping(target = "code", ignore = true)
@@ -50,4 +51,15 @@ public interface SchoolClassMapper {
 
     @Mapping(target = "password", ignore = true)
     User toEntity(RegisterUserRequestDto registerUserRequestDto);
+
+    RegisterEventDto teacherToRegisterEventDto(Teacher teacher);
+
+    @Mapping(source = "generatedPassword", target = "password")
+    UserRequestDto toDto(RegisterEventDto event);
+
+    RegisterEventDto parentToRegisterEventDto(Parent saved);
+
+    User toEntity(UserRequestDto userRequestDto);
+
+    Student toEntity(CreateStudentRequestDto createStudentRequestDto);
 }

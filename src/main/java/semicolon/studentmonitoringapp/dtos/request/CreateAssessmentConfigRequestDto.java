@@ -5,6 +5,7 @@ import jakarta.validation.constraints.NotNull;
 import lombok.Getter;
 import lombok.Setter;
 import semicolon.studentmonitoringapp.utils.annotations.Trimmed;
+import semicolon.studentmonitoringapp.utils.annotations.ValidAcademicYear;
 
 import java.util.UUID;
 
@@ -23,5 +24,6 @@ public class CreateAssessmentConfigRequestDto {
     private Integer weight;
     @NotBlank(message = "please enter an academic year")
     @Trimmed
+    @ValidAcademicYear
     private String academicYear;
 }

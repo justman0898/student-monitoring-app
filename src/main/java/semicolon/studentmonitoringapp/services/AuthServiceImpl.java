@@ -2,9 +2,7 @@ package semicolon.studentmonitoringapp.services;
 
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.AllArgsConstructor;
-import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -13,6 +11,7 @@ import semicolon.studentmonitoringapp.data.models.User;
 import semicolon.studentmonitoringapp.data.repositories.UserRepository;
 import semicolon.studentmonitoringapp.dtos.request.LoginRequestDto;
 import semicolon.studentmonitoringapp.dtos.request.RegisterUserRequestDto;
+import semicolon.studentmonitoringapp.dtos.request.UserRequestDto;
 import semicolon.studentmonitoringapp.security.CustomUserDetails;
 import semicolon.studentmonitoringapp.security.JwtProvider;
 import semicolon.studentmonitoringapp.security.UserPrincipal;
@@ -55,7 +54,7 @@ public class AuthServiceImpl implements AuthService {
     }
 
     @Override
-    public UUID register(RegisterUserRequestDto registerUserRequestDto) {
+    public UUID registerAdmin(RegisterUserRequestDto registerUserRequestDto) {
         User user = schoolClassMapper.toEntity(registerUserRequestDto);
         user.setPassword(passwordEncoder.encode(registerUserRequestDto.getPassword()));
         Set<Role> roles = new HashSet<>();
@@ -65,6 +64,24 @@ public class AuthServiceImpl implements AuthService {
         log.info("New user created: {}",
                 objectMapper.writeValueAsString(user));
         return user.getId();
+    }
+
+    @Override
+    public void registerUser(UserRequestDto userRequestDto) {
+
+        Set<Role> roles = userRequestDto.getRoles();
+        User user = userRepository.findByEmail(userRequestDto.getEmail())
+                        .map(found-> {
+                            found.getRoles().addAll(roles);
+                            return found;
+                        }).or(()->{
+                    User newUser = schoolClassMapper.toEntity(userRequestDto);
+                    return java.util.Optional.of(newUser);
+                }).orElseThrow(() -> new IllegalStateException("Could not create user"));;
+
+        userRepository.save(user);
+        log.info("Saved: {}", user);
+
     }
 
 

@@ -12,9 +12,8 @@ import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
 import semicolon.studentmonitoringapp.data.models.Gender;
-import semicolon.studentmonitoringapp.data.models.Teacher;
 import semicolon.studentmonitoringapp.dtos.request.RegisterTeacherRequestDto;
-import semicolon.studentmonitoringapp.dtos.response.TeacherRegistrationDetailsDto;
+import semicolon.studentmonitoringapp.dtos.response.RegistrationDetailsDto;
 import semicolon.studentmonitoringapp.dtos.response.TeacherResponseDto;
 import semicolon.studentmonitoringapp.services.AdminTeacherService;
 import semicolon.studentmonitoringapp.services.AuthService;
@@ -71,7 +70,7 @@ class AdminTeacherControllerImplTest {
 
 
         when(service.registerTeacher(any()))
-                .thenReturn(new TeacherRegistrationDetailsDto());
+                .thenReturn(new RegistrationDetailsDto());
         when(entityManager.createQuery(anyString(), eq(Long.class)))
                 .thenReturn(query);
         when(query.setParameter(anyString(), any(String.class)))

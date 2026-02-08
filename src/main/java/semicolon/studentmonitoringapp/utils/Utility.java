@@ -27,6 +27,14 @@ public class Utility {
         return sb.toString();
     }
 
+    public static @NotNull String generateParentPassword() {
+        StringBuilder sb = new StringBuilder("PNT-");
+        for (int i = 0; i < 6; i++) {
+            sb.append(CHAR_POOL.charAt(random.nextInt(CHAR_POOL.length())));
+        }
+        return sb.toString();
+    }
+
     public LoginRequestDto extractRequest(HttpServletRequest request) throws IOException {
         return objectMapper.readValue(request.getInputStream(), LoginRequestDto.class);
     }

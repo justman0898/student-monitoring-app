@@ -1,13 +1,14 @@
 package semicolon.studentmonitoringapp.contollers;
 
 import jakarta.validation.Valid;
+import lombok.AllArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import semicolon.studentmonitoringapp.dtos.request.RegisterTeacherRequestDto;
 import semicolon.studentmonitoringapp.dtos.response.IdResponse;
-import semicolon.studentmonitoringapp.dtos.response.TeacherRegistrationDetailsDto;
+import semicolon.studentmonitoringapp.dtos.response.RegistrationDetailsDto;
 import semicolon.studentmonitoringapp.dtos.response.TeacherResponseDto;
 import semicolon.studentmonitoringapp.services.AdminTeacherService;
 
@@ -16,17 +17,15 @@ import java.util.UUID;
 
 @RestController
 @RequestMapping("/api/v1/teachers")
+@AllArgsConstructor
 public class AdminTeacherControllerImpl implements AdminTeacherController {
 
     private final AdminTeacherService adminTeacherService;
 
-    public AdminTeacherControllerImpl(AdminTeacherService adminTeacherService) {
-        this.adminTeacherService = adminTeacherService;
-    }
 
     @Override
     @PostMapping
-    public ResponseEntity<TeacherRegistrationDetailsDto> registerTeacher(@Valid @RequestBody RegisterTeacherRequestDto registerRequestDto) {
+    public ResponseEntity<RegistrationDetailsDto> registerTeacher(@Valid @RequestBody RegisterTeacherRequestDto registerRequestDto) {
 
         return ResponseEntity
                 .status(HttpStatus.CREATED)

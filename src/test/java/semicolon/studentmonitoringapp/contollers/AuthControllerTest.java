@@ -19,7 +19,6 @@ import tools.jackson.databind.ObjectMapper;
 
 import java.util.UUID;
 
-import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.when;
@@ -65,7 +64,7 @@ class AuthControllerTest {
 
         UUID userId = UUID.randomUUID();
 
-        when(authService.register(any())).thenReturn(userId);
+        when(authService.registerAdmin(any())).thenReturn(userId);
         when(entityManager.createQuery(anyString(), eq(Long.class)))
                 .thenReturn(query);
         when(query.setParameter(anyString(), any()))

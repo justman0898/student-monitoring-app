@@ -3,7 +3,6 @@ package semicolon.studentmonitoringapp.contollers;
 import jakarta.validation.Valid;
 import lombok.AllArgsConstructor;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.HttpStatusCode;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -25,7 +24,7 @@ public class AuthController {
     @PostMapping("/register")
     public ResponseEntity<IdResponse> register(@Valid @RequestBody
                                                    RegisterUserRequestDto registerUserRequestDto) {
-        UUID  userId = authService.register(registerUserRequestDto);
+        UUID  userId = authService.registerAdmin(registerUserRequestDto);
         return ResponseEntity
                 .status(HttpStatus.CREATED)
                 .body(new IdResponse(userId));

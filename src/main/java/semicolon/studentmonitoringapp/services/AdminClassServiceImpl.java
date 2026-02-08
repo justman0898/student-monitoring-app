@@ -2,6 +2,7 @@ package semicolon.studentmonitoringapp.services;
 
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import semicolon.studentmonitoringapp.data.models.*;
@@ -10,7 +11,9 @@ import semicolon.studentmonitoringapp.dtos.request.*;
 import semicolon.studentmonitoringapp.dtos.response.*;
 import semicolon.studentmonitoringapp.exceptions.NotFoundException;
 import semicolon.studentmonitoringapp.exceptions.SchoolClassDuplicateException;
+import semicolon.studentmonitoringapp.utils.Utility;
 import semicolon.studentmonitoringapp.utils.mappers.SchoolClassMapper;
+import semicolon.studentmonitoringapp.utils.messaging.RegisteredEventPublisher;
 import tools.jackson.databind.ObjectMapper;
 
 import java.util.*;
@@ -28,6 +31,8 @@ public class AdminClassServiceImpl implements AdminClassService {
     private final AssessmentConfigRepository assessmentConfigRepository;
     private final SubjectRepository subjectRepository;
     private final ObjectMapper objectMapper;
+    private final RegisteredEventPublisher registeredEventPublisher;
+    private final PasswordEncoder passwordEncoder;
 
 
     @Override
@@ -57,8 +62,12 @@ public class AdminClassServiceImpl implements AdminClassService {
     @Transactional
     public void updateClass(UUID classId, SchoolClassPatchRequestDto classPatchDto) {
         SchoolClass schoolClass = getSchoolClass(classId);
-        getAllTeachersById(classPatchDto.getTeachers()).forEach(schoolClass::addTeacher);
-        getAllStudentsById(classPatchDto.getStudents()).forEach(schoolClass::addStudent);
+        if(!classPatchDto.getTeachers().isEmpty())
+            getAllTeachersById(classPatchDto.getTeachers())
+                    .forEach(schoolClass::addTeacher);
+        if(!classPatchDto.getStudents().isEmpty())
+            getAllStudentsById(classPatchDto.getStudents())
+                .forEach(schoolClass::addStudent);
         classRepository.save(schoolClass);
         log.info("Updated: {}", objectMapper.writeValueAsString(classPatchDto));
     }
@@ -86,14 +95,31 @@ public class AdminClassServiceImpl implements AdminClassService {
 
     @Override
     @Transactional
-    public UUID createParentProfile(CreateParentRequestDto createParentRequestDto) {
+    public RegistrationDetailsDto createParentProfile(CreateParentRequestDto createParentRequestDto) {
         Parent parent = schoolClassMapper.toEntity(createParentRequestDto);
         List<Student> students = studentRepository.findAllById(createParentRequestDto.getStudentIds());
         parent.setStudents(new HashSet<>(students));
+        String password = Utility.generateParentPassword();
+        String hashedPassword = passwordEncoder.encode(password);
+        parent.setGeneratedPassword(hashedPassword);
+
         Parent saved = parentRepository.save(parent);
+
+        RegisterEventDto registerEventDto = schoolClassMapper
+                .parentToRegisterEventDto(saved);
+        Set<Role> roles = new HashSet<>();
+        roles.add(Role.PARENT);
+        registerEventDto.setRoles(roles);
+        registeredEventPublisher.broadcastEvent(registerEventDto);
+
+        RegistrationDetailsDto registrationDetailsDto = new RegistrationDetailsDto();
+        registrationDetailsDto.setEmail(parent.getEmail());
+        registrationDetailsDto.setGeneratedPassword(password);
+
         log.info("Created Parent: {}",
                 objectMapper.writeValueAsString(saved));
-        return saved.getId();
+
+        return registrationDetailsDto;
     }
 
     @Override
@@ -129,22 +155,37 @@ public class AdminClassServiceImpl implements AdminClassService {
                 .toList();
     }
 
+    @Override
+    @Transactional
+    public UUID updateParent(UpdateParentRequestDto updateParentRequestDto) {
+        Parent parent = getParent(updateParentRequestDto);
+        if(updateParentRequestDto.getPhone() != null)
+            parent.setPhone(updateParentRequestDto.getPhone());
+
+        if(updateParentRequestDto.getAddress() != null)
+            parent.setAddress(updateParentRequestDto.getAddress());
+
+        if(!updateParentRequestDto.getStudentIds().isEmpty())
+            studentRepository
+                .findAllById(updateParentRequestDto.getStudentIds())
+                .forEach(parent::addStudent);
+
+        parentRepository.save(parent);
+        return parent.getId();
+    }
+
+    @Override
+    public UUID registerStudent(CreateStudentRequestDto createStudentRequestDto) {
+        Student student = schoolClassMapper.toEntity(createStudentRequestDto);
+        studentRepository.save(student);
+        return student.getId();
+    }
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+    private Parent getParent(UpdateParentRequestDto updateParentRequestDto) {
+        return parentRepository.findById(updateParentRequestDto.getId())
+                        .orElseThrow(()-> new NotFoundException("parent not found"));
+    }
 
 
     private AssessmentConfig mapAssessmentConfigToEntity(CreateAssessmentConfigRequestDto assessmentConfigRequestDto) {

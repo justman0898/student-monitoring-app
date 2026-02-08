@@ -1,11 +1,7 @@
 package semicolon.studentmonitoringapp.security;
 
-import com.fasterxml.jackson.core.JsonParser;
-import com.fasterxml.jackson.databind.DeserializationContext;
-import com.fasterxml.jackson.databind.JsonDeserializer;
 import com.fasterxml.jackson.databind.Module;
 import com.fasterxml.jackson.databind.module.SimpleModule;
-import org.mapstruct.factory.Mappers;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
@@ -13,39 +9,27 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
-import org.springframework.security.core.userdetails.UserDetails;
-import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import semicolon.studentmonitoringapp.security.admin.AdminLoginFilter;
-import semicolon.studentmonitoringapp.security.config.StringTrimDeserializer;
 import semicolon.studentmonitoringapp.security.parent.ParentLoginFilter;
 import semicolon.studentmonitoringapp.security.teacher.TeacherLoginFilter;
-import semicolon.studentmonitoringapp.utils.mappers.SchoolClassMapper;
 
-import java.io.IOException;
 import java.time.Clock;
 
 @Configuration
 public class SecurityConfig {
     @Value("${SECRET_KEY}")
     private String secretKey;
-    @Autowired
-    private StringTrimDeserializer stringTrimDeserializer;
 
     @Bean
     public PasswordEncoder passwordEncoder() {
         return new BCryptPasswordEncoder();
     }
 
-    @Bean
-    public Module stringTrimModule() {
-        SimpleModule module = new SimpleModule();
-        module.addDeserializer(String.class, stringTrimDeserializer);
-        return module;
-    }
+
 
     @Bean
     public Clock clock() {
@@ -74,7 +58,7 @@ public class SecurityConfig {
                         .requestMatchers(HttpMethod.POST, "/api/v1/admin/**").hasRole("ADMIN")
                         .requestMatchers(HttpMethod.POST, "/api/v1/subjects/**").hasRole("TEACHER")
                         .requestMatchers(HttpMethod.POST, "/api/v1/student/classes").hasRole("STUDENT")
-                        .requestMatchers(HttpMethod.POST, "/api/v1/teachers/**").hasRole("TEACHER")
+                        .requestMatchers(HttpMethod.POST, "/api/v1/teachers/**").hasRole("ADMIN")
                         .requestMatchers(HttpMethod.GET, "/api/v1/teachers/").hasAnyRole("TEACHER", "ADMIN")
                         .requestMatchers(HttpMethod.GET, "/api/v1/teachers/{teacherId}")
                                         .hasAnyRole("STUDENT", "ADMIN", "TEACHER")
