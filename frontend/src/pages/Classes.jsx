@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react'
 import { Plus, Trash2, UserPlus } from 'lucide-react'
 import { classAPI, teacherAPI } from '../services/api'
+import api from '../services/api'
 
 const Classes = () => {
   const [classes, setClasses] = useState([])
@@ -61,7 +62,9 @@ const Classes = () => {
 
   const handleAssignTeacher = async (teacherId) => {
     try {
-      await classAPI.assignTeacher(selectedClass.id, teacherId)
+      // Note: Backend expects PATCH /admin/classes/{classId}/assign/{teacherId} but we don't have this endpoint
+      // Using the unassign endpoint structure as reference, we'll create a custom call
+      await api.patch(`/admin/classes/${selectedClass.id}/assign/${teacherId}`)
       setShowAssignModal(false)
       setSelectedClass(null)
       fetchData()

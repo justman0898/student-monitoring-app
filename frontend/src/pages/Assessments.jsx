@@ -39,6 +39,16 @@ const Assessments = () => {
     }
   }
 
+  const handleAddComment = async (commentData) => {
+    try {
+      await assessmentAPI.addComment(commentData)
+      alert('Comment added successfully!')
+    } catch (error) {
+      console.error('Error adding comment:', error)
+      alert('Failed to add comment')
+    }
+  }
+
   return (
     <div>
       <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-8">
@@ -104,11 +114,23 @@ const Assessments = () => {
         <div className="bg-white rounded-xl shadow-sm p-6">
           <h2 className="text-xl font-semibold mb-4">Quick Actions</h2>
           <div className="space-y-3">
-            <button className="w-full p-4 text-left bg-blue-50 hover:bg-blue-100 rounded-lg transition-colors">
+            <button 
+              onClick={() => handleAddComment({ 
+                studentId: 'sample-student-id', 
+                comment: 'Sample subject comment',
+                type: 'SUBJECT'
+              })}
+              className="w-full p-4 text-left bg-blue-50 hover:bg-blue-100 rounded-lg transition-colors">
               <p className="font-medium text-blue-900">Add Subject Comment</p>
               <p className="text-sm text-blue-700">Provide feedback on subject performance</p>
             </button>
-            <button className="w-full p-4 text-left bg-purple-50 hover:bg-purple-100 rounded-lg transition-colors">
+            <button 
+              onClick={() => handleAddComment({ 
+                studentId: 'sample-student-id', 
+                comment: 'Sample student comment',
+                type: 'STUDENT'
+              })}
+              className="w-full p-4 text-left bg-purple-50 hover:bg-purple-100 rounded-lg transition-colors">
               <p className="font-medium text-purple-900">Add Student Comment</p>
               <p className="text-sm text-purple-700">Add general comments for student</p>
             </button>
