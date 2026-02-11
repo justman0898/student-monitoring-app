@@ -15,6 +15,8 @@ import org.springframework.test.web.servlet.MockMvc;
 import semicolon.studentmonitoringapp.dtos.request.CreateSubjectRequestDto;
 import semicolon.studentmonitoringapp.dtos.response.IdResponse;
 import semicolon.studentmonitoringapp.dtos.response.SubjectResponseDto;
+import semicolon.studentmonitoringapp.security.CustomUserDetails;
+import semicolon.studentmonitoringapp.security.JwtProvider;
 import semicolon.studentmonitoringapp.services.AdminSubjectService;
 import semicolon.studentmonitoringapp.services.AuthService;
 import semicolon.studentmonitoringapp.utils.Utility;
@@ -51,6 +53,13 @@ class AdminSubjectControllerImplTest {
 
     @MockitoBean
     private UserDetailsService userDetailsService;
+
+    @MockitoBean
+    private JwtProvider jwtProvider;
+
+    @MockitoBean
+    private CustomUserDetails customUserDetails;
+
 
     @MockitoBean
     AdminSubjectService subjectService;

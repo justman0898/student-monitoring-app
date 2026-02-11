@@ -18,23 +18,20 @@ services:
       - "5672:5672"
       - "15672:15672"
 
-  ai:
-    image: ollama/ollama
+  redis:
+    image: redis:7.2-alpine
+    container_name: student-monitoring-app-redis
     ports:
-      - "11434:11434"
-    volumes:
-      - ollama:/root/.ollama
-    deploy:
-      resources:
-        limits:
-          memory: 8g
-
+      - "6379:6379"
+    command: [ "redis-server", "--appendonly", "yes" ]
 
 
   backend:
     build: .
     depends_on:
       - postgres
+      - redis
+      - rabbitmq
     environment:
       SPRING_DATASOURCE_URL: jdbc:postgresql://postgres:5432/student_monitoring
       SPRING_DATASOURCE_USERNAME: postgres
@@ -46,7 +43,7 @@ services:
 
 volumes:
   postgres_data:
-  ollama:
+
 
 
 

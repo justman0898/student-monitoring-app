@@ -15,6 +15,8 @@ import semicolon.studentmonitoringapp.data.models.Gender;
 import semicolon.studentmonitoringapp.dtos.request.RegisterTeacherRequestDto;
 import semicolon.studentmonitoringapp.dtos.response.RegistrationDetailsDto;
 import semicolon.studentmonitoringapp.dtos.response.TeacherResponseDto;
+import semicolon.studentmonitoringapp.security.CustomUserDetails;
+import semicolon.studentmonitoringapp.security.JwtProvider;
 import semicolon.studentmonitoringapp.services.AdminTeacherService;
 import semicolon.studentmonitoringapp.services.AuthService;
 import semicolon.studentmonitoringapp.utils.Utility;
@@ -47,7 +49,7 @@ class AdminTeacherControllerImplTest {
     private AuthService authService;
 
     @MockitoBean
-    private UserDetailsService userDetailsService;
+    private JwtProvider jwtProvider;
 
     @MockitoBean
     private Utility utility;
@@ -57,6 +59,13 @@ class AdminTeacherControllerImplTest {
 
     @MockitoBean
     private TypedQuery<Long> query;
+
+    @MockitoBean
+    private UserDetailsService userDetailsService;
+
+
+    @MockitoBean
+    private CustomUserDetails customUserDetails;
 
 
     @Test

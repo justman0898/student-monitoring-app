@@ -13,6 +13,8 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
 import semicolon.studentmonitoringapp.dtos.request.RegisterUserRequestDto;
+import semicolon.studentmonitoringapp.security.CustomUserDetails;
+import semicolon.studentmonitoringapp.security.JwtProvider;
 import semicolon.studentmonitoringapp.services.AuthService;
 import semicolon.studentmonitoringapp.utils.Utility;
 import tools.jackson.databind.ObjectMapper;
@@ -43,8 +45,9 @@ class AuthControllerTest {
     private AuthService authService;
 
 
-    @MockitoBean
-    private UserDetailsService userDetailsService;
+
+
+
 
     @MockitoBean
     private Utility utility;
@@ -55,6 +58,14 @@ class AuthControllerTest {
     @MockitoBean
     private TypedQuery<Long> query;
 
+    @MockitoBean
+    private UserDetailsService userDetailsService;
+
+    @MockitoBean
+    private JwtProvider jwtProvider;
+
+    @MockitoBean
+    private CustomUserDetails customUserDetails;
     @Test
     void testThatCanRegisterUser() throws Exception {
 

@@ -8,6 +8,7 @@ import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 import semicolon.studentmonitoringapp.exceptions.NotFoundException;
+import semicolon.studentmonitoringapp.exceptions.OtpException;
 import semicolon.studentmonitoringapp.exceptions.SchoolClassDuplicateException;
 
 
@@ -71,12 +72,10 @@ public class GlobalExceptionHandler {
 
     }
 
-    private static void logError(String schoolClassDuplicateException) {
-        log.error("message: {}", schoolClassDuplicateException);
-    }
+
 
     @ExceptionHandler(Exception.class)
-    public ResponseEntity<Map<String, String>> handleException(
+    public ResponseEntity<Map<String, String>> handleOtpException(
             Exception exception
     ){
         log.error("Unexpected error", exception);
@@ -89,5 +88,30 @@ public class GlobalExceptionHandler {
                 .contentType(MediaType.APPLICATION_JSON)
                 .body(errors);
             
+    }
+
+    public ResponseEntity<Map<String, String>> handleOtpException(
+            OtpException otpException
+    ){
+        log.error("Error occurred", otpException);
+
+        Map<String, String> errors = new HashMap<>();
+        errors.put("message", otpException.getMessage());
+
+        return ResponseEntity
+                .status(HttpStatus.NOT_FOUND)
+                .contentType(MediaType.APPLICATION_JSON)
+                .body(errors);
+    }
+
+
+
+
+
+
+
+
+    private static void logError(String schoolClassDuplicateException) {
+        log.error("message: {}", schoolClassDuplicateException);
     }
 }

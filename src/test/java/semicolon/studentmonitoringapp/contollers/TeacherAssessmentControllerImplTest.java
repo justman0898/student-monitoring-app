@@ -13,6 +13,8 @@ import semicolon.studentmonitoringapp.data.repositories.CommentRepository;
 import semicolon.studentmonitoringapp.dtos.request.CreateCommentRequestDto;
 import semicolon.studentmonitoringapp.dtos.request.SubmitScoreRequestDto;
 import semicolon.studentmonitoringapp.dtos.request.UpdateScoreRequestDto;
+import semicolon.studentmonitoringapp.security.CustomUserDetails;
+import semicolon.studentmonitoringapp.security.JwtProvider;
 import semicolon.studentmonitoringapp.services.AuthService;
 import semicolon.studentmonitoringapp.services.TeacherAssessmentService;
 import semicolon.studentmonitoringapp.utils.Utility;
@@ -49,6 +51,14 @@ class TeacherAssessmentControllerImplTest {
 
     @MockitoBean
     private Utility utility;
+
+
+
+    @MockitoBean
+    private JwtProvider jwtProvider;
+
+    @MockitoBean
+    private CustomUserDetails customUserDetails;
 
     @MockitoBean
     CommentRepository commentRepository;
