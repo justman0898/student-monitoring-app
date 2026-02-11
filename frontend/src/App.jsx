@@ -1,8 +1,11 @@
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom'
 import Layout from './components/Layout'
 import Dashboard from './pages/Dashboard'
+import TeacherDashboard from './pages/TeacherDashboard'
+import ParentDashboard from './pages/ParentDashboard'
 import Teachers from './pages/Teachers'
 import Classes from './pages/Classes'
+import Students from './pages/Students'
 import Subjects from './pages/Subjects'
 import Parents from './pages/Parents'
 import Assessments from './pages/Assessments'
@@ -49,6 +52,16 @@ function App() {
             </Layout>
           </ProtectedRoute>
         } />
+        <Route path="/teacher-dashboard" element={
+          <ProtectedRoute>
+            <TeacherDashboard />
+          </ProtectedRoute>
+        } />
+        <Route path="/parent-dashboard" element={
+          <ProtectedRoute>
+            <ParentDashboard />
+          </ProtectedRoute>
+        } />
         <Route path="/teachers" element={
           <ProtectedRoute>
             <Layout>
@@ -60,6 +73,13 @@ function App() {
           <ProtectedRoute>
             <Layout>
               <Classes />
+            </Layout>
+          </ProtectedRoute>
+        } />
+        <Route path="/students" element={
+          <ProtectedRoute>
+            <Layout>
+              <Students />
             </Layout>
           </ProtectedRoute>
         } />

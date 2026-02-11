@@ -1,19 +1,40 @@
 import axios from 'axios'
 
 const api = axios.create({
-  baseURL: '/api/v1',
+  baseURL: import.meta.env.VITE_API_BASE_URL || '/api/v1',
   headers: {
     'Content-Type': 'application/json'
   }
 })
 
-// Add request interceptor to include auth token
+// Helper function to trim all string values in an object
+const trimObjectValues = (obj) => {
+  if (obj === null || obj === undefined) return obj
+  if (typeof obj === 'string') return obj.trim()
+  if (Array.isArray(obj)) return obj.map(trimObjectValues)
+  if (typeof obj === 'object') {
+    const trimmed = {}
+    for (const [key, value] of Object.entries(obj)) {
+      trimmed[key] = trimObjectValues(value)
+    }
+    return trimmed
+  }
+  return obj
+}
+
+// Add request interceptor to include auth token and trim inputs
 api.interceptors.request.use(
   (config) => {
     const token = localStorage.getItem('token')
     if (token) {
       config.headers.Authorization = `Bearer ${token}`
     }
+    
+    // Trim all string values in request data
+    if (config.data) {
+      config.data = trimObjectValues(config.data)
+    }
+    
     return config
   },
   (error) => {
@@ -40,9 +61,11 @@ export const classAPI = {
   getAllClasses: () => api.get('/admin/classes'),
   updateClass: (classId, patch) => api.patch(`/admin/classes/${classId}`, patch),
   deleteClass: (classId) => api.delete(`/admin/classes/de-activate/${classId}`),
-  assignTeacher: (classId, teacherId) => api.post(`/admin/classes/${classId}/assign/${teacherId}`),
+  assignTeacher: (classId, teacherId) => api.patch(`/admin/classes/${classId}/assign/${teacherId}`),
   unassignTeacher: (classId, teacherId) => api.patch(`/admin/classes/${classId}/un-assign/${teacherId}`),
   addParent: (data) => api.post('/admin/classes/create-parent', data),
+  updateParent: (data) => api.patch('/admin/classes/update-parent', data),
+  registerStudent: (data) => api.post('/admin/classes/students', data),
   createAssessmentType: (data) => api.post('/admin/classes/assessment-type', data),
   createAssessmentConfig: (data) => api.post('/admin/classes/assessment-config', data),
   getAssessmentType: (assessmentTypeId) => api.get(`/admin/classes/${assessmentTypeId}`),
@@ -54,7 +77,9 @@ export const teacherAPI = {
   registerTeacher: (data) => api.post('/teachers', data),
   getTeachers: () => api.get('/teachers'),
   getTeacher: (teacherId) => api.get(`/teachers/${teacherId}`),
-  removeTeacher: (teacherId) => api.delete(`/teachers/${teacherId}`)
+  removeTeacher: (teacherId) => api.delete(`/teachers/${teacherId}`),
+  getProfile: (teacherId) => api.get(`/teachers/me`),
+  getStudentsInClass: (classId) => api.get(`/teachers/classes/${classId}/students`)
 }
 
 // Subject APIs

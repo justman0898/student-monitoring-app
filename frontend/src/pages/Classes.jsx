@@ -8,8 +8,6 @@ const Classes = () => {
   const [teachers, setTeachers] = useState([])
   const [loading, setLoading] = useState(true)
   const [showModal, setShowModal] = useState(false)
-  const [showAssignModal, setShowAssignModal] = useState(false)
-  const [selectedClass, setSelectedClass] = useState(null)
   const [formData, setFormData] = useState({
     name: '',
     grade: '',
@@ -60,17 +58,16 @@ const Classes = () => {
     }
   }
 
-  const handleAssignTeacher = async (teacherId) => {
-    try {
-      // Note: Backend expects PATCH /admin/classes/{classId}/assign/{teacherId} but we don't have this endpoint
-      // Using the unassign endpoint structure as reference, we'll create a custom call
-      await api.patch(`/admin/classes/${selectedClass.id}/assign/${teacherId}`)
-      setShowAssignModal(false)
-      setSelectedClass(null)
-      fetchData()
-    } catch (error) {
-      console.error('Error assigning teacher:', error)
-      alert('Failed to assign teacher')
+  const handleUnassignTeacher = async (classId, teacherId) => {
+    if (window.confirm('Are you sure you want to unassign this teacher?')) {
+      try {
+        await classAPI.unassignTeacher(classId, teacherId)
+        fetchData()
+        alert('Teacher unassigned successfully!')
+      } catch (error) {
+        console.error('Error unassigning teacher:', error)
+        alert('Failed to unassign teacher')
+      }
     }
   }
 
@@ -118,16 +115,21 @@ const Classes = () => {
                     <span className="font-medium">Teacher:</span> {classItem.teacherName || 'Not assigned'}
                   </p>
                 </div>
-                <button
-                  onClick={() => {
-                    setSelectedClass(classItem)
-                    setShowAssignModal(true)
-                  }}
-                  className="w-full flex items-center justify-center gap-2 px-4 py-2 bg-green-500 text-white rounded-lg hover:bg-green-600 transition-colors"
-                >
-                  <UserPlus className="w-4 h-4" />
-                  Assign Teacher
-                </button>
+                <div className="flex gap-2">
+                  {classItem.teacherId ? (
+                    <button
+                      onClick={() => handleUnassignTeacher(classItem.id, classItem.teacherId)}
+                      className="flex-1 flex items-center justify-center gap-2 px-4 py-2 bg-red-500 text-white rounded-lg hover:bg-red-600 transition-colors"
+                    >
+                      <UserPlus className="w-4 h-4" />
+                      Unassign Teacher
+                    </button>
+                  ) : (
+                    <div className="flex-1 px-4 py-2 bg-gray-100 text-gray-500 rounded-lg text-center">
+                      No teacher assigned
+                    </div>
+                  )}
+                </div>
               </div>
             ))
           )}
@@ -185,36 +187,6 @@ const Classes = () => {
                 </button>
               </div>
             </form>
-          </div>
-        </div>
-      )}
-
-      {showAssignModal && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
-          <div className="bg-white rounded-xl max-w-md w-full p-6">
-            <h2 className="text-2xl font-bold mb-4">Assign Teacher</h2>
-            <p className="text-gray-600 mb-4">Select a teacher for {selectedClass?.name}</p>
-            <div className="space-y-2 max-h-96 overflow-y-auto">
-              {teachers.map((teacher) => (
-                <button
-                  key={teacher.id}
-                  onClick={() => handleAssignTeacher(teacher.id)}
-                  className="w-full text-left p-3 border border-gray-200 rounded-lg hover:bg-gray-50 transition-colors"
-                >
-                  <p className="font-medium">{teacher.firstName} {teacher.lastName}</p>
-                  <p className="text-sm text-gray-600">{teacher.specialization}</p>
-                </button>
-              ))}
-            </div>
-            <button
-              onClick={() => {
-                setShowAssignModal(false)
-                setSelectedClass(null)
-              }}
-              className="w-full mt-4 px-4 py-2 border border-gray-300 rounded-lg hover:bg-gray-50"
-            >
-              Cancel
-            </button>
           </div>
         </div>
       )}

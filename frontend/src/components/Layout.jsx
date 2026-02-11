@@ -11,6 +11,7 @@ const Layout = ({ children }) => {
     { name: 'Dashboard', href: '/dashboard', icon: Home },
     { name: 'Teachers', href: '/teachers', icon: Users },
     { name: 'Classes', href: '/classes', icon: GraduationCap },
+    { name: 'Students', href: '/students', icon: Users },
     { name: 'Subjects', href: '/subjects', icon: BookOpen },
     { name: 'Parents', href: '/parents', icon: UserPlus },
     { name: 'Assessments', href: '/assessments', icon: ClipboardList },

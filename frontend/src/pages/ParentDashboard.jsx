@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react'
-import { Users, BookOpen, TrendingUp, LogOut, Eye } from 'lucide-react'
-import { parentAPI } from '../services/api'
+import { Users, BookOpen, TrendingUp, LogOut, Eye, Plus, Edit } from 'lucide-react'
+import { parentAPI, classAPI } from '../services/api'
 import { useAuth } from '../contexts/AuthContext'
 import { useNavigate } from 'react-router-dom'
 
@@ -8,7 +8,15 @@ const ParentDashboard = () => {
   const [linkedStudents, setLinkedStudents] = useState([])
   const [selectedStudent, setSelectedStudent] = useState(null)
   const [studentResults, setStudentResults] = useState([])
+  const [showUpdateModal, setShowUpdateModal] = useState(false)
   const [loading, setLoading] = useState(true)
+  const [updateData, setUpdateData] = useState({
+    firstName: '',
+    lastName: '',
+    email: '',
+    phoneNumber: '',
+    address: ''
+  })
   const { user, logout } = useAuth()
   const navigate = useNavigate()
 
@@ -41,6 +49,18 @@ const ParentDashboard = () => {
     fetchStudentResults(student.id)
   }
 
+  const handleUpdateProfile = async (e) => {
+    e.preventDefault()
+    try {
+      await classAPI.updateParent({ ...updateData, parentId: user.id })
+      setShowUpdateModal(false)
+      alert('Profile updated successfully!')
+    } catch (error) {
+      console.error('Error updating profile:', error)
+      alert('Failed to update profile')
+    }
+  }
+
   const handleLogout = () => {
     logout()
     navigate('/login')
@@ -68,15 +88,26 @@ const ParentDashboard = () => {
           <div className="flex justify-between items-center h-16">
             <div>
               <h1 className="text-2xl font-bold text-gray-900">Parent Dashboard</h1>
-              <p className="text-sm text-gray-600">Monitor your child's academic progress</p>
+              <p className="text-sm text-gray-600">
+                Welcome back, {user?.firstName} {user?.lastName}
+              </p>
             </div>
-            <button
-              onClick={handleLogout}
-              className="flex items-center gap-2 px-4 py-2 text-gray-600 hover:text-gray-900 transition-colors"
-            >
-              <LogOut className="w-5 h-5" />
-              Logout
-            </button>
+            <div className="flex items-center gap-4">
+              <button
+                onClick={() => setShowUpdateModal(true)}
+                className="flex items-center gap-2 px-4 py-2 text-blue-600 hover:text-blue-800 transition-colors"
+              >
+                <Edit className="w-5 h-5" />
+                Update Profile
+              </button>
+              <button
+                onClick={handleLogout}
+                className="flex items-center gap-2 px-4 py-2 text-gray-600 hover:text-gray-900 transition-colors"
+              >
+                <LogOut className="w-5 h-5" />
+                Logout
+              </button>
+            </div>
           </div>
         </div>
       </header>
@@ -87,7 +118,7 @@ const ParentDashboard = () => {
           <div className="bg-white rounded-xl shadow-sm p-6">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-sm text-gray-600 mb-1">My Children</p>
+                <p className="text-sm text-gray-600 mb-1">Linked Students</p>
                 <p className="text-3xl font-bold text-gray-900">{linkedStudents.length}</p>
               </div>
               <div className="bg-blue-500 p-3 rounded-lg">
@@ -99,13 +130,13 @@ const ParentDashboard = () => {
           <div className="bg-white rounded-xl shadow-sm p-6">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-sm text-gray-600 mb-1">Total Subjects</p>
+                <p className="text-sm text-gray-600 mb-1">Average Performance</p>
                 <p className="text-3xl font-bold text-gray-900">
-                  {selectedStudent ? studentResults.length : '-'}
+                  {calculateAverage(studentResults)}%
                 </p>
               </div>
               <div className="bg-green-500 p-3 rounded-lg">
-                <BookOpen className="w-6 h-6 text-white" />
+                <TrendingUp className="w-6 h-6 text-white" />
               </div>
             </div>
           </div>
@@ -113,20 +144,18 @@ const ParentDashboard = () => {
           <div className="bg-white rounded-xl shadow-sm p-6">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-sm text-gray-600 mb-1">Average Score</p>
-                <p className="text-3xl font-bold text-gray-900">
-                  {selectedStudent ? `${calculateAverage(studentResults)}%` : '-'}
-                </p>
+                <p className="text-sm text-gray-600 mb-1">Total Assessments</p>
+                <p className="text-3xl font-bold text-gray-900">{studentResults.length}</p>
               </div>
               <div className="bg-purple-500 p-3 rounded-lg">
-                <TrendingUp className="w-6 h-6 text-white" />
+                <BookOpen className="w-6 h-6 text-white" />
               </div>
             </div>
           </div>
         </div>
 
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-          {/* Students List */}
+          {/* Linked Students */}
           <div className="bg-white rounded-xl shadow-sm p-6">
             <h2 className="text-xl font-semibold mb-4">My Children</h2>
             <div className="space-y-3">
@@ -134,37 +163,28 @@ const ParentDashboard = () => {
                 linkedStudents.map((student) => (
                   <div
                     key={student.id}
-                    className={`p-4 border-2 rounded-lg transition-colors cursor-pointer ${
-                      selectedStudent?.id === student.id
-                        ? 'border-blue-500 bg-blue-50'
-                        : 'border-gray-200 hover:border-gray-300'
-                    }`}
-                    onClick={() => handleViewResults(student)}
+                    className="p-4 border border-gray-200 rounded-lg hover:bg-gray-50"
                   >
                     <div className="flex justify-between items-start">
                       <div>
                         <h3 className="font-medium text-gray-900">
                           {student.firstName} {student.lastName}
                         </h3>
-                        <p className="text-sm text-gray-600">
-                          Class: {student.className} - Grade {student.grade}
-                        </p>
-                        <p className="text-sm text-gray-500">ID: {student.id}</p>
+                        <p className="text-sm text-gray-600">Class: {student.className}</p>
+                        <p className="text-sm text-gray-600">ID: {student.id}</p>
                       </div>
-                      <button className="text-blue-600 hover:text-blue-800">
-                        <Eye className="w-5 h-5" />
+                      <button
+                        onClick={() => handleViewResults(student)}
+                        className="flex items-center gap-1 text-blue-600 hover:text-blue-800 text-sm font-medium"
+                      >
+                        <Eye className="w-4 h-4" />
+                        View Results
                       </button>
                     </div>
                   </div>
                 ))
               ) : (
-                <div className="text-center py-8">
-                  <Users className="w-12 h-12 text-gray-400 mx-auto mb-4" />
-                  <p className="text-gray-500">No children linked to your account</p>
-                  <p className="text-sm text-gray-400 mt-2">
-                    Contact the school administrator to link your children
-                  </p>
-                </div>
+                <p className="text-gray-500 text-center py-4">No linked students found.</p>
               )}
             </div>
           </div>
@@ -172,86 +192,123 @@ const ParentDashboard = () => {
           {/* Student Results */}
           <div className="bg-white rounded-xl shadow-sm p-6">
             <h2 className="text-xl font-semibold mb-4">
-              Academic Results
-              {selectedStudent && ` - ${selectedStudent.firstName} ${selectedStudent.lastName}`}
+              {selectedStudent ? `${selectedStudent.firstName}'s Results` : 'Student Results'}
             </h2>
             <div className="space-y-3 max-h-96 overflow-y-auto">
               {selectedStudent ? (
                 studentResults.length > 0 ? (
                   studentResults.map((result, index) => (
-                    <div key={index} className="p-4 border border-gray-200 rounded-lg">
+                    <div
+                      key={index}
+                      className="p-4 border border-gray-200 rounded-lg"
+                    >
                       <div className="flex justify-between items-start">
                         <div>
-                          <h3 className="font-medium text-gray-900">{result.subjectName}</h3>
-                          <p className="text-sm text-gray-600">
-                            {result.assessmentType} - {result.term}
-                          </p>
+                          <h3 className="font-medium text-gray-900">{result.subject}</h3>
+                          <p className="text-sm text-gray-600">{result.assessmentType}</p>
                           <p className="text-sm text-gray-500">{result.date}</p>
                         </div>
                         <div className="text-right">
-                          <span
-                            className={`px-3 py-1 rounded-full text-sm font-medium ${
-                              result.score >= 80
-                                ? 'bg-green-100 text-green-800'
-                                : result.score >= 60
-                                ? 'bg-yellow-100 text-yellow-800'
-                                : 'bg-red-100 text-red-800'
-                            }`}
-                          >
-                            {result.score}/{result.maxScore}
+                          <span className={`px-3 py-1 rounded-full text-sm font-medium ${
+                            result.percentage >= 80 ? 'bg-green-100 text-green-800' :
+                            result.percentage >= 60 ? 'bg-yellow-100 text-yellow-800' :
+                            'bg-red-100 text-red-800'
+                          }`}>
+                            {result.score}/{result.maxScore} ({result.percentage}%)
                           </span>
-                          <p className="text-xs text-gray-500 mt-1">
-                            {Math.round((result.score / result.maxScore) * 100)}%
-                          </p>
                         </div>
                       </div>
                       {result.comment && (
-                        <div className="mt-3 p-3 bg-gray-50 rounded-lg">
-                          <p className="text-sm text-gray-700">{result.comment}</p>
-                        </div>
+                        <p className="text-sm text-gray-600 mt-2 italic">"{result.comment}"</p>
                       )}
                     </div>
                   ))
                 ) : (
-                  <div className="text-center py-8">
-                    <BookOpen className="w-12 h-12 text-gray-400 mx-auto mb-4" />
-                    <p className="text-gray-500">No results available</p>
-                  </div>
+                  <p className="text-gray-500 text-center py-4">No results found for this student.</p>
                 )
               ) : (
-                <div className="text-center py-8">
-                  <p className="text-gray-500">Select a child to view their results</p>
-                </div>
+                <p className="text-gray-500 text-center py-4">Select a student to view their results.</p>
               )}
             </div>
           </div>
         </div>
-
-        {/* Performance Summary */}
-        {selectedStudent && studentResults.length > 0 && (
-          <div className="mt-6 bg-white rounded-xl shadow-sm p-6">
-            <h2 className="text-xl font-semibold mb-4">Performance Summary</h2>
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-              <div className="p-4 bg-green-50 rounded-lg">
-                <p className="text-sm text-gray-600 mb-1">Highest Score</p>
-                <p className="text-2xl font-bold text-green-700">
-                  {Math.max(...studentResults.map(r => Math.round((r.score / r.maxScore) * 100)))}%
-                </p>
-              </div>
-              <div className="p-4 bg-blue-50 rounded-lg">
-                <p className="text-sm text-gray-600 mb-1">Average Score</p>
-                <p className="text-2xl font-bold text-blue-700">
-                  {calculateAverage(studentResults.map(r => Math.round((r.score / r.maxScore) * 100)))}%
-                </p>
-              </div>
-              <div className="p-4 bg-purple-50 rounded-lg">
-                <p className="text-sm text-gray-600 mb-1">Total Assessments</p>
-                <p className="text-2xl font-bold text-purple-700">{studentResults.length}</p>
-              </div>
-            </div>
-          </div>
-        )}
       </div>
+
+      {/* Update Profile Modal */}
+      {showUpdateModal && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+          <div className="bg-white rounded-xl max-w-md w-full p-6">
+            <h2 className="text-2xl font-bold mb-4">Update Profile</h2>
+            <form onSubmit={handleUpdateProfile} className="space-y-4">
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">First Name</label>
+                <input
+                  type="text"
+                  required
+                  value={updateData.firstName}
+                  onChange={(e) => setUpdateData({ ...updateData, firstName: e.target.value })}
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent"
+                />
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">Last Name</label>
+                <input
+                  type="text"
+                  required
+                  value={updateData.lastName}
+                  onChange={(e) => setUpdateData({ ...updateData, lastName: e.target.value })}
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent"
+                />
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">Email</label>
+                <input
+                  type="email"
+                  required
+                  value={updateData.email}
+                  onChange={(e) => setUpdateData({ ...updateData, email: e.target.value })}
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent"
+                />
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">Phone Number</label>
+                <input
+                  type="tel"
+                  required
+                  value={updateData.phoneNumber}
+                  onChange={(e) => setUpdateData({ ...updateData, phoneNumber: e.target.value })}
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent"
+                />
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">Address</label>
+                <textarea
+                  required
+                  value={updateData.address}
+                  onChange={(e) => setUpdateData({ ...updateData, address: e.target.value })}
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent"
+                  rows="3"
+                />
+              </div>
+              <div className="flex gap-3 pt-4">
+                <button
+                  type="button"
+                  onClick={() => setShowUpdateModal(false)}
+                  className="flex-1 px-4 py-2 border border-gray-300 rounded-lg hover:bg-gray-50"
+                >
+                  Cancel
+                </button>
+                <button
+                  type="submit"
+                  className="flex-1 px-4 py-2 bg-primary text-white rounded-lg hover:bg-blue-600"
+                >
+                  Update Profile
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
     </div>
   )
 }
