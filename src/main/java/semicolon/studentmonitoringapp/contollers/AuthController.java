@@ -8,6 +8,8 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+import semicolon.studentmonitoringapp.dtos.request.ChangePasswordRequestDto;
+import semicolon.studentmonitoringapp.dtos.request.PasswordResetRequest;
 import semicolon.studentmonitoringapp.dtos.request.RegisterUserRequestDto;
 import semicolon.studentmonitoringapp.dtos.response.IdResponse;
 import semicolon.studentmonitoringapp.services.AuthService;
@@ -28,5 +30,20 @@ public class AuthController {
         return ResponseEntity
                 .status(HttpStatus.CREATED)
                 .body(new IdResponse(userId));
+    }
+
+    @PostMapping("/request-otp")
+    public ResponseEntity<?> requestPasswordReset(@Valid  @RequestBody PasswordResetRequest resetRequest){
+        authService.requestPasswordReset(resetRequest.getEmail());
+        return ResponseEntity
+                .status(HttpStatus.OK)
+                .build();
+    }
+
+    @PostMapping("/change-password")
+    public ResponseEntity<?> changePassword(@Valid @RequestBody ChangePasswordRequestDto changePasswordRequestDto) {
+        return ResponseEntity
+                .status(HttpStatus.NO_CONTENT)
+                .body(authService.changePassword(changePasswordRequestDto));
     }
 }
